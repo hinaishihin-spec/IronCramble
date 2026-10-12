@@ -105,7 +105,7 @@ function updatePlayer(dt) {
     if (p.shieldIdle > 0.5) p.shield = Math.min(SHIELD_MAX, p.shield + SHIELD_REGEN * dt);
   }
 
-  // Dash / Boost: กด E + ทิศทาง A/D (dashBuffer ถูกตั้งจาก GameScene เมื่อกด E)
+  // Dash / Boost: กด Shift + ทิศทาง A/D (dashBuffer ถูกตั้งจาก PlayScene เมื่อกด Shift)
   p.dashCd -= dt;
   p.dashBuffer -= dt;
   if (p.dashBuffer > 0 && dir !== 0 && p.dashCd <= 0 && p.dashT <= 0 && !p.shieldUp) {

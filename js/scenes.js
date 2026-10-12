@@ -110,7 +110,7 @@ const PlayScene = {
     if (player.dead) drawDeadOverlay();
   },
   keydown: function (e) {
-    if (e.code === 'KeyE') player.dashBuffer = 0.15;             // E = Dash (ต้องกดทิศ A/D ค้างด้วย)
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') player.dashBuffer = 0.15;   // Shift = Dash (ต้องกดทิศ A/D ค้างด้วย)
     else if (e.code === 'KeyR' && player.dead) resetMission();
     else if (e.code === 'Escape') Scenes.go('menu');
   }
