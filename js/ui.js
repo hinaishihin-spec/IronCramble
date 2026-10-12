@@ -18,6 +18,13 @@ function drawText(s, x, y, font, color, align) {
   ctx.textAlign = 'left';
 }
 
+// วาดข้อความกึ่งกลางที่ย่อขนาดลงอัตโนมัติถ้ายาวเกิน maxW (ใช้กับสรุปศัตรูของด่านที่มีหลายชนิด)
+function drawFitText(s, x, y, weight, size, color, maxW) {
+  ctx.font = fnt(weight, size);
+  while (size > 8 && ctx.measureText(s).width > maxW) { size--; ctx.font = fnt(weight, size); }
+  drawText(s, x, y, fnt(weight, size), color, 'center');
+}
+
 // ---------- เป้าเล็ง ----------
 function drawCrosshair() {
   const x = mouse.x, y = mouse.y;
@@ -275,7 +282,7 @@ function drawMenuScreen(buttons, hover) {
 
   const m = currentMission();                         // ด่านที่จะได้เล่นต่อ (ด่านล่าสุดที่ปลดล็อก)
   drawText('NEXT: ' + m.name, W / 2, 280, fnt(600, 13), '#d9dfd2', 'center');
-  drawText('ทำลายศัตรูทั้งหมด (' + missionSummaryText(m) + ')  |  ความยาว ' + m.lengthM + ' m', W / 2, 298, fnt(400, 12), '#8d978c', 'center');
+  drawFitText('ทำลายศัตรูทั้งหมด (' + missionSummaryText(m) + ')  |  ความยาว ' + m.lengthM + ' m', W / 2, 298, 400, 12, '#8d978c', 776);
 
   for (let i = 0; i < buttons.length; i++) drawButton(buttons[i], i === hover);
 
@@ -457,6 +464,18 @@ function drawSubChip(t, hot, active) {
   if (equippedGun().type === t.sub) { ctx.fillStyle = '#5fd36f'; ctx.fillRect(t.x + t.w - 9, t.y + 6, 4, 4); }
 }
 
+// ปุ่มสลับกลุ่มซีรีส์ในหมวดพาร์ท (จุดเขียว = กลุ่มที่มีชิ้นที่สวมอยู่)
+function drawGroupChip(t, hot, active) {
+  ctx.fillStyle = active ? '#5a4710' : (hot ? '#2b333b' : '#1a2026');
+  ctx.fillRect(t.x, t.y, t.w, t.h);
+  ctx.strokeStyle = active ? '#e0a526' : (hot ? '#59636d' : '#333c45');
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(t.x + 1, t.y + 1, t.w - 2, t.h - 2);
+  drawText('[' + t.key + '] ' + (PART_GROUP_LABEL[t.pgroup] || t.pgroup), t.x + t.w / 2, t.y + 14, fnt(700, 10), active ? '#ffd23f' : '#d9dfd2', 'center');
+  const eq = findPart(HangarScene.tab, profile.equippedParts[HangarScene.tab]);
+  if (eq && partGroupOf(eq) === t.pgroup) { ctx.fillStyle = '#5fd36f'; ctx.fillRect(t.x + t.w - 9, t.y + 6, 4, 4); }
+}
+
 // แถวอาวุธ 1 กระบอกแบบกะทัดรัด (กล่อง h=22): ชื่อ + ประเภท + สเตตัส + สถานะ (สวมอยู่ / มีแล้ว / ราคา)
 function drawWeaponRow(c, hot) {
   const w = c.wp, st = weaponState(w.id);
@@ -495,14 +514,18 @@ function drawPartCard(c, hot) {
   const canAct = st === 'buy' || st === 'owned';
   ctx.fillStyle = st === 'equipped' ? '#1f2a1d' : (hot ? '#222a31' : '#1a2026');
   ctx.fillRect(c.x, c.y, c.w, c.h);
-  ctx.strokeStyle = st === 'equipped' ? '#5fd36f' : (hot ? (canAct ? '#e0a526' : '#59636d') : '#333c45');
+  ctx.strokeStyle = st === 'equipped' ? '#5fd36f' : (hot ? (canAct ? '#e0a526' : '#59636d') : (st === 'locked' ? '#3a2a2a' : '#333c45'));
   ctx.lineWidth = 2;
   ctx.strokeRect(c.x + 1, c.y + 1, c.w - 2, c.h - 2);
   drawText('[' + c.key + ']', c.x + 12, c.y + 19, fnt(600, 11), '#6f7a70');
-  drawText(PART_CAT_LABEL[c.cat] + '  ' + c.part.name, c.x + 36, c.y + 19, fnt(700, 13), st === 'poor' ? '#a8873a' : '#e0a526');
-  drawText(partStatsText(c.cat, c.part), c.x + 36, c.y + 36, fnt(400, 11), '#b3bbb0');
+  drawText(PART_CAT_LABEL[c.cat] + '  ' + c.part.name, c.x + 36, c.y + 19, fnt(700, 13), st === 'locked' ? '#8a6a5f' : (st === 'poor' ? '#a8873a' : '#e0a526'));
+  drawText(partStatsText(c.cat, c.part), c.x + 36, c.y + 36, fnt(400, 11), st === 'locked' ? '#6f7a70' : '#b3bbb0');
   const rx = c.x + c.w - 14;
-  if (st === 'equipped') drawText('EQUIPPED', rx, c.y + 27, fnt(700, 14), '#5fd36f', 'right');
+  if (st === 'locked') {
+    const lk = partLock(c.cat, c.part.id);
+    drawText('LOCKED  ' + c.part.price + ' CR', rx, c.y + 19, fnt(700, 13), '#e0583a', 'right');
+    drawText('ชนะบอสด่าน ' + lk.mission + ' (' + lk.have + '/' + lk.need + ')', rx, c.y + 35, fnt(600, 10), '#b98a7e', 'right');
+  } else if (st === 'equipped') drawText('EQUIPPED', rx, c.y + 27, fnt(700, 14), '#5fd36f', 'right');
   else if (st === 'owned') {
     drawText('OWNED', rx, c.y + 19, fnt(700, 14), '#d9dfd2', 'right');
     drawText('คลิกเพื่อสวม', rx, c.y + 35, fnt(600, 10), '#5fd36f', 'right');
@@ -566,6 +589,7 @@ function drawHangarScreen(h) {
     else if (it.part) drawPartCard(it, i === h.hover);
     else if (it.wp) drawWeaponRow(it, i === h.hover);
     else if (it.sub) drawSubChip(it, i === h.hover, it.sub === h.sub);
+    else if (it.pgroup) drawGroupChip(it, i === h.hover, it.pgroup === h.groupFor(h.tab, partGroups(h.tab)));
     else drawButton(it, i === h.hover);
   }
   drawMissionSelector(214, 346, 276, 50);
@@ -576,7 +600,7 @@ function drawHangarScreen(h) {
   if (isOverweight()) {
     drawText('OVERWEIGHT: น้ำหนักรวม ' + calculateTotalWeight() + ' เกินที่รับได้ ' + partsMaxLoad() + '  เปลี่ยนลำตัว/ขา/แพ็กหลังหรือถอดพาร์ทก่อนออกรบ', W / 2, 411, fnt(700, 11), '#e0583a', 'center');
   } else if (unlocked) {
-    drawText('ศัตรู: ' + missionSummaryText(sm) + '    รางวัลจบด่าน +' + sm.bonusExp + ' EXP  +' + sm.bonusGold + ' CR', W / 2, 411, fnt(400, 11), '#8d978c', 'center');
+    drawFitText('ศัตรู: ' + missionSummaryText(sm) + '    รางวัลจบด่าน +' + sm.bonusExp + ' EXP  +' + sm.bonusGold + ' CR', W / 2, 411, 400, 11, '#8d978c', 776);
   } else {
     drawText('ปลดล็อกเมื่อเคลียร์ภารกิจครบ ' + sm.unlockAt + ' ครั้ง (ตอนนี้ ' + profile.missions + ')', W / 2, 411, fnt(600, 11), '#e0583a', 'center');
   }
@@ -586,7 +610,7 @@ function drawHangarScreen(h) {
     drawText(h.msg, W / 2, 427, fnt(700, 13), h.msgOk ? '#5fd36f' : '#e0583a', 'center');
     ctx.globalAlpha = 1;
   }
-  drawText('1-8 เปลี่ยนหมวด   Q W E R T Y U I O P / คลิก = ซื้อและสวม   Z X C V = ประเภทปืน   H = ถอด/ใส่อาวุธ (ดูหุ่นเปล่า)   A / D เลือกด่าน   Enter = LAUNCH   Esc = เมนูหลัก', W / 2, 442, fnt(400, 11), '#6f7a70', 'center');
+  drawFitText('1-8 หมวด   Q-P / คลิก = ซื้อและสวม   Z X C V B = ประเภทปืน/ซีรีส์   H = ถอด/ใส่อาวุธ   A / D เลือกด่าน   Enter = LAUNCH   Esc = เมนูหลัก', W / 2, 442, 400, 11, '#6f7a70', 776);
 }
 
 // ตัวเลือกด่านระหว่างปุ่มลูกศรสองข้าง (ปุ่ม < > เป็นรายการใน HangarScene.items)

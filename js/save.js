@@ -64,11 +64,20 @@ const Save = (function () {
       const w = findWeapon(eq);
       if (w && w.slot === slot && ownedWeapons.indexOf(eq) >= 0) equippedWeapon[slot] = eq;
     }
+    // จำนวนครั้งที่เคลียร์แต่ละด่าน { เลขด่าน: จำนวนครั้ง } (ใช้ปลดล็อกพาร์ท ดู partext.js)
+    const clears = {};
+    if (o.clears && typeof o.clears === 'object') {
+      for (const k of Object.keys(o.clears)) {
+        const mid = toInt(k, 1, 999), n = toInt(o.clears[k], 0, 99999);
+        if (n > 0) clears[mid] = n;
+      }
+    }
     return {
       level: level,
       exp: toInt(o.exp, 0, expToNext(level) - 1),
       gold: toInt(toInt(o.gold, 0, 999999999) + refund, 0, 999999999),
       missions: toInt(o.missions, 0, 999999),
+      clears: clears,
       // ฟิลด์จากอู่ซ่อม: เซฟเก่าที่ไม่มีฟิลด์เหล่านี้จะได้ค่าเริ่มต้น 0 (เซฟเดิมใช้ต่อได้)
       ownedParts: ownedParts,
       equippedParts: equippedParts,
@@ -87,7 +96,7 @@ const Save = (function () {
     return JSON.stringify({
       format: FORMAT, v: 2, savedAt: Date.now(),
       data: {
-        level: p.level, exp: p.exp, gold: p.gold, missions: p.missions,
+        level: p.level, exp: p.exp, gold: p.gold, missions: p.missions, clears: p.clears,
         ownedParts: p.ownedParts, equippedParts: p.equippedParts,
         ownedWeapons: p.ownedWeapons, equippedWeapon: p.equippedWeapon
       }

@@ -19,6 +19,7 @@ const HangarScene = {
   flash: 0,
   sub: 'MACHINE_GUN',  // ประเภทปืนที่เปิดอยู่ในแท็บปืน
   hideWeapons: false,  // ดูตัวอย่างหุ่นแบบถอดอาวุธทั้งหมด (เฉพาะภาพพรีวิว ไม่ถอดอาวุธจริง)
+  pg: {},              // กลุ่มซีรีส์ที่เปิดอยู่ของแต่ละหมวดพาร์ท { HEAD: 'ZEUS', ... } (ดู partext.js)
   tab: 'HEAD',         // แท็บที่เปิดอยู่: HEAD | BODY | ARMS | LEGS | BACKPACK | GUN | MISSILE
 
   enter: function () {
@@ -42,8 +43,16 @@ const HangarScene = {
       const list = weaponList('missile');
       for (let i = 0; i < list.length; i++) items.push({ wp: list[i], key: ROW_KEYS[i], x: 356, y: 90 + i * 24, w: 420, h: 22 });
     } else {
-      const list = partList(this.tab);
-      for (let i = 0; i < list.length; i++) items.push({ part: list[i], cat: this.tab, key: ROW_KEYS[i], x: 356, y: 90 + i * 48, w: 420, h: 44 });
+      let list = partList(this.tab), y0 = 90;
+      const groups = partGroups(this.tab);
+      if (groups.length > 1) {                        // หมวดที่มีหลายซีรีส์ (เช่น STD + ZEUS): ปุ่มสลับกลุ่มด้านบน
+        const g = this.groupFor(this.tab, groups);
+        for (let i = 0; i < groups.length; i++) items.push({ pgroup: groups[i], key: SUB_KEYS[i], x: 356 + i * 104, y: 88, w: 100, h: 20 });
+        list = list.filter(function (p) { return partGroupOf(p) === g; });
+        y0 = 114;
+      }
+      const pitch = Math.min(48, Math.floor((340 - y0) / Math.max(1, list.length)));
+      for (let i = 0; i < list.length; i++) items.push({ part: list[i], cat: this.tab, key: ROW_KEYS[i], x: 356, y: y0 + i * pitch, w: 420, h: pitch - 4 });
     }
     this.items = items.concat([
       {
@@ -57,6 +66,13 @@ const HangarScene = {
       { x: 38, y: 92, w: 92, h: 24, small: true, label: function () { return HangarScene.hideWeapons ? 'ใส่อาวุธ' : 'ถอดอาวุธ'; }, action: function () { HangarScene.hideWeapons = !HangarScene.hideWeapons; } },
       { x: 24, y: 352, w: 180, h: 38, label: 'MAIN MENU', hint: 'Esc', action: function () { Scenes.go('menu'); } }
     ]);
+  },
+
+  // กลุ่มซีรีส์ที่แสดงอยู่ของหมวดพาร์ท: ที่เลือกไว้ล่าสุด ไม่งั้นกลุ่มของพาร์ทที่สวมอยู่
+  groupFor: function (cat, groups) {
+    if (this.pg[cat] && groups.indexOf(this.pg[cat]) >= 0) return this.pg[cat];
+    const eq = findPart(cat, profile.equippedParts[cat]);
+    return eq ? partGroupOf(eq) : groups[0];
   },
 
   setTab: function (t) {
@@ -119,7 +135,10 @@ const HangarScene = {
     const dm = /^(?:Digit|Numpad)([1-8])$/.exec(e.code);
     const rm = ROW_CODES.indexOf(e.code);
     const sm = this.tab === 'GUN' ? SUB_KEYS.indexOf(e.code.slice(3)) : -1;
-    if (dm) this.setTab(HANGAR_TABS[+dm[1] - 1]);                  // 1-8 = เปลี่ยนแท็บ
+    const isPartTab = this.tab !== 'GUN' && this.tab !== 'MISSILE';
+    const gm = isPartTab && e.code.indexOf('Key') === 0 ? SUB_KEYS.indexOf(e.code.slice(3)) : -1;
+    if (gm >= 0 && partGroups(this.tab)[gm]) { this.pg[this.tab] = partGroups(this.tab)[gm]; this.rebuild(); }   // Z X = สลับกลุ่มซีรีส์ของหมวดพาร์ท
+    else if (dm) this.setTab(HANGAR_TABS[+dm[1] - 1]);                  // 1-8 = เปลี่ยนแท็บ
     else if (sm >= 0 && e.code.indexOf('Key') === 0) { this.sub = GUN_TYPES[sm]; this.rebuild(); }   // Z X C V B = ประเภทปืน/อาวุธประชิด
     else if (rm >= 0) {                                            // Q W E R T Y U I O P = แถวที่ 1-10 ของแท็บนี้
       const it = this.items.filter(function (x) { return x.part || x.wp; })[rm];
@@ -139,6 +158,7 @@ const HangarScene = {
     if (it.tab) { this.setTab(it.tab); return; }
     if (it.part) { this.pickPart(it.cat, it.part.id); return; }
     if (it.sub) { this.sub = it.sub; this.rebuild(); return; }
+    if (it.pgroup) { this.pg[this.tab] = it.pgroup; this.rebuild(); return; }
     if (it.wp) { this.pickWeapon(it.wp.id); return; }
     if (it.primary) { this.launch(); return; }        // ปุ่ม LAUNCH: ถ้าด่านล็อก launch() จะแสดงข้อความบอกสาเหตุ
     const off = typeof it.disabled === 'function' ? it.disabled() : it.disabled;

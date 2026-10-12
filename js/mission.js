@@ -138,6 +138,7 @@ function completeMission() {
   profile.gold += def.bonusGold;
   run.gold += def.bonusGold;
   profile.missions++;
+  profile.clears[def.id] = (profile.clears[def.id] || 0) + 1;      // นับจำนวนครั้งที่เคลียร์ด่านนี้ (ด่านมีบอส = ชนะบอสครั้งหนึ่ง) ใช้ปลดล็อกพาร์ท
   saveProfile();
 
   // ถ้าเคลียร์ครั้งนี้ปลดล็อกด่านใหม่ ให้เลือกด่านนั้นรอไว้ใน Hangar และแจ้งบนหน้าสรุปผล
