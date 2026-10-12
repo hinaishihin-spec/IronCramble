@@ -10,7 +10,7 @@
                ชนิด: 'walker' | 'drone' | 'tank' | 'chopper' | 'sniper'
                | 'bomber' (ตัวเลขที่ 3 = ความสูงบิน) | 'launcher' (รถมิสไซล์ลูกเดียว) | 'swarmer' (รถมิสไซล์ฝูง)
                (sniper: ตัวเลขที่ 2 = เยื้องเข้าซ้ายจากขอบจอขวา เมื่อมีสไนเปอร์หลายตัวในเวฟเดียว)
-   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper' }
+   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber' }
                ด่านที่มีบอส: จบเมื่อกำจัดบอสได้ (เวฟทั้งหมดต้องอยู่ก่อนระยะ at)
    ด่านจบเมื่อ: ทุกเวฟโผล่ครบแล้ว และกำจัดศัตรูหมดทุกตัว (หรือกำจัดบอสได้ ถ้าด่านมีบอส)
    ========================================================================== */
@@ -75,7 +75,7 @@ const MISSIONS = [
   {
     id: 5, title: 'AIR RAID', name: 'MISSION 05  AIR RAID',
     lengthM: 1500, unlockAt: 4, bonusExp: 400, bonusGold: 800,
-    // ยังไม่มีบอส (จะเพิ่มทีหลัง): ด่านจบเมื่อกำจัดศัตรูครบ  ถ้าเพิ่มบอส ให้ใส่ boss: { at: 1300, ... } และเวฟสุดท้ายต้องอยู่ก่อน 1300 m
+    boss: { at: 1300, name: 'GIANT BOMBER', kind: 'bomber' },
     waves: [
       { at: 80,   units: [['launcher', 0], ['walker', 100]] },
       { at: 200,  units: [['bomber', 0, 80]] },
@@ -86,7 +86,7 @@ const MISSIONS = [
       { at: 850,  units: [['swarmer', 0], ['swarmer', 160], ['sniper', 0]] },
       { at: 990,  units: [['bomber', 0, 80], ['bomber', 220, 105], ['launcher', 100]] },
       { at: 1130, units: [['bomber', 0, 90], ['swarmer', 100], ['launcher', 200], ['chopper', 60]] },
-      { at: 1230, units: [['bomber', 0, 80], ['bomber', 160, 105], ['swarmer', 60]] }
+      { at: 1230, units: [['bomber', 0, 80], ['bomber', 160, 105], ['swarmer', 60]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1300 m)
     ]
   }
 ];

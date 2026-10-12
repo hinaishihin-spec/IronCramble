@@ -62,9 +62,10 @@ function updateBomber(e, dt, pcx, pcy) {
 
 // ระเบิดตกพื้น: แรงระเบิดกระจายซ้าย-ขวา (โดนเมื่อผู้เล่นอยู่ใกล้พื้น) — เรียกจาก updateEnemyShots
 function bombSplash(s) {
-  smallBoom(s.x, GROUND_Y - 6, 30);
-  smallBoom(s.x + 14, GROUND_Y - 2, 20);
-  spawnSparks(s.x, GROUND_Y, 10, '#ffb13b');
+  const k = s.sc || 1;
+  smallBoom(s.x, GROUND_Y - 6, 30 * k);
+  smallBoom(s.x + 14 * k, GROUND_Y - 2, 20 * k);
+  spawnSparks(s.x, GROUND_Y, 10 * k, '#ffb13b');
   if (player.dead) return;
   if (s.x >= player.x - s.splash && s.x <= player.x + player.w + s.splash && player.y + player.h >= GROUND_Y - 34) {
     damagePlayer(s.dmg, s.shieldCost);

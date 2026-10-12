@@ -224,3 +224,30 @@ const SWARMER_GAP = 0.16;          // ห่างกันลูกละกี
 const SWARMER_MISSILE_DMG = 8;
 const SWARMER_MISSILE_SPEED = 225;
 const SWARMER_MISSILE_SHIELD_COST = 6;
+
+// Boss: Giant Bomber (ท้ายด่าน 05) — เครื่องบินทิ้งระเบิดยักษ์ เฟส 1 ทิ้งระเบิดใหญ่เป็นพรม เฟส 2 ปล่อยเครื่องบินขับไล่จิ๋วแทน (boss3.js)
+const GB_W = 190, GB_H = 50;
+const GB_HP = 760;
+const GB_PHASE2_HP = 380;
+const GB_ARMOR = 0.2;
+const GB_EXP = 500;
+const GB_REWARD_GOLD = 450;
+const GB_Y = 112;
+const GB_SPEED = 190, GB_SPEED2 = 230;      // px/s (เฟส 1 / เฟส 2)
+const GB_ACCEL = 240;
+const GB_MARGIN = 100;                      // บินเลยขอบจอไปไกลเท่านี้ค่อยกลับลำ
+const GB_BOMB_CD = 0.45;                    // ระยะห่างระหว่างลูกระเบิด (วินาที)
+const GB_BOMB_WINDOW = 150;
+const GB_BOMB_DMG = 26;
+const GB_BOMB_SPLASH = 56;
+const GB_BOMB_SCALE = 1.7;
+const GB_BOMB_SHIELD_COST = 20;
+const GB_LAUNCH_CD = 3.2;                   // เฟส 2: ปล่อยเครื่องบินขับไล่ทุกกี่วินาที
+const GB_LAUNCH_N = 2;                      // ครั้งละกี่ลำ
+const GB_FIGHTER_CAP = 5;                   // อยู่ในจอพร้อมกันได้สูงสุด
+const FIGHTER_W = 36, FIGHTER_H = 14;
+const FIGHTER_HP = 20;
+const FIGHTER_SPEED = 280;
+const FIGHTER_SHOT_DMG = 5;
+const FIGHTER_SHOT_SPEED = 400;
+const FIGHTER_BURST_CD = 1.7;

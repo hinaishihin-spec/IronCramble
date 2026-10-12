@@ -12,18 +12,21 @@ function makeBossFor(def, lockX) {
   const startX = lockX + W + 30;
   if (def.kind === 'hopper') return makeHopper(startX, lockX);
   if (def.kind === 'sniper') return makeBossSniper(startX, lockX);
+  if (def.kind === 'bomber') return makeGiantBomber(startX, lockX);       // boss3.js
   return makeBoss(startX, lockX + W - BOSS_W - 24, lockX + W * 0.52);
 }
 
 function updateBoss(e, dt, pcx, pcy) {
   if (e.kind === 'hopper') updateHopper(e, dt, pcx, pcy);
   else if (e.kind === 'sniper') updateBossSniper(e, dt, pcx, pcy);
+  else if (e.kind === 'bomber') updateGiantBomber(e, dt, pcx, pcy);
   else updateFortress(e, dt, pcx, pcy);
 }
 
 function drawBoss(e, sx, sy, flash) {
   if (e.kind === 'hopper') drawHopper(e, sx, sy, flash);
   else if (e.kind === 'sniper') drawBossSniper(e, sx, sy, flash);
+  else if (e.kind === 'bomber') drawGiantBomber(e, sx, sy, flash);
   else drawFortress(e, sx, sy, flash);
 }
 

@@ -27,9 +27,9 @@ const WANZER_PARTS = {
     { id: "hammer_1", name: "Hammer I", price: 200, damageBonus: 1.15, weight: 15 }
   ],
   LEGS: [
-    { id: "basic", name: "Basic Block", price: 0, speedBonus: 1.0, boostBonus: 1.0, weight: 0 },
-    { id: "zeriot_1", name: "Zeriot I", price: 150, speedBonus: 1.1, boostBonus: 1.1, weight: 10 },
-    { id: "hammer_1", name: "Hammer I", price: 200, speedBonus: 0.9, boostBonus: 0.8, weight: 25 }
+    { id: "basic", name: "Basic Block", price: 0, speedBonus: 1.0, boostBonus: 1.0, weight: 0,  maxLoad: 0 },
+    { id: "zeriot_1", name: "Zeriot I", price: 150, speedBonus: 1.1, boostBonus: 1.1, weight: 10,  maxLoad: 8 },
+    { id: "hammer_1", name: "Hammer I", price: 200, speedBonus: 0.9, boostBonus: 0.8, weight: 25,  maxLoad: 30 }
   ],
   SHOULDERS: [
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 10, weight: 0, spriteUrl: "assets/basic_shoulder.png" },
@@ -188,8 +188,12 @@ function calculateTotalWeight(parts, weapons) {
 // น้ำหนักที่รับได้รวม = maxLoad ของลำตัว + maxLoad ของแพ็กหลัง (แพ็กหลังช่วยแบกด้วย แต่ตัวมันเองก็มี weight)
 function partsMaxLoad(parts) {
   parts = parts || profile.equippedParts;
-  const b = findPart('BODY', parts.BODY), k = findPart('BACKPACK', parts.BACKPACK);
-  return (b ? b.maxLoad : 0) + (k ? k.maxLoad : 0);
+  let total = 0;
+  for (const c of ['BODY', 'LEGS', 'BACKPACK']) {
+    const p = findPart(c, parts[c]);
+    total += p && p.maxLoad ? p.maxLoad : 0;
+  }
+  return total;
 }
 function isOverweight(parts, weapons) { return calculateTotalWeight(parts, weapons) > partsMaxLoad(parts); }   // เกิน = กด LAUNCH ไม่ได้
 function partsWeight() { return calculateTotalWeight(); }
@@ -233,6 +237,6 @@ function partStatsText(cat, p) {
   if (cat === 'HEAD') return 'HP +' + p.hpBonus + '   น้ำหนัก ' + p.weight;
   if (cat === 'BODY') return 'HP +' + p.hpBonus + '   พลังงาน ' + p.energy + '   รับน้ำหนักได้ ' + p.maxLoad;
   if (cat === 'ARMS') return 'พลังโจมตี x' + p.damageBonus.toFixed(2) + '   น้ำหนัก ' + p.weight;
-  if (cat === 'LEGS') return 'ความเร็ว x' + p.speedBonus.toFixed(2) + '   Boost x' + p.boostBonus.toFixed(2) + '   น้ำหนัก ' + p.weight;
+  if (cat === 'LEGS') return 'ความเร็ว x' + p.speedBonus.toFixed(2) + '   Boost x' + p.boostBonus.toFixed(2) + '   น้ำหนัก ' + p.weight+ '   รับน้ำหนักได้ ' + p.maxLoad;
   return 'Booster บินได้ ' + p.boostDuration.toFixed(1) + ' วิ   น้ำหนัก ' + p.weight + '   รับน้ำหนัก +' + p.maxLoad;
 }

@@ -53,7 +53,7 @@ function damageEnemy(e, dmg, heavy, ignoreArmor) {
 }
 
 function knockEnemy(e, dx, dy) {
-  if (e.type === 'boss' || e.type === 'chopper' || e.type === 'sniper' || e.type === 'bomber') return;   // บอส/เฮลิคอปเตอร์/สไนเปอร์ไม่โดนผลัก
+  if (e.type === 'boss' || e.type === 'chopper' || e.type === 'sniper' || e.type === 'bomber' || e.type === 'fighter') return;   // บอส/เฮลิคอปเตอร์/สไนเปอร์ไม่โดนผลัก
   const k = (e.type === 'tank' || e.type === 'launcher' || e.type === 'swarmer') ? 0.2 : 1;           // รถถังหนัก ถูกผลักได้น้อยมาก
   e.kx = dx * KNOCKBACK * k;
   if (e.type === 'drone') e.ky = dy * KNOCKBACK * 0.6;
@@ -87,6 +87,7 @@ function updateEnemies(dt) {
     if (e.type === 'chopper') { updateChopper(e, dt, pcx, pcy); continue; }     // enemy2.js
     if (e.type === 'sniper') { updateSniper(e, dt, pcx, pcy); continue; }       // enemy2.js
     if (e.type === 'bomber') { updateBomber(e, dt, pcx, pcy); continue; }       // enemy3.js
+    if (e.type === 'fighter') { updateFighter(e, dt, pcx, pcy); continue; }     // boss3.js (ลูกน้อง Giant Bomber)
     if (e.type === 'launcher' || e.type === 'swarmer') { updateLauncher(e, dt, pcx, pcy); continue; }   // enemy3.js
 
     // แรงผลักจากมิสไซล์ (ค่อยๆ ลดลง)
@@ -262,6 +263,9 @@ function drawEnemies() {
     } else if (e.type === 'bomber') {
       drawBomber(e, sx, sy, flash);
       barY = sy - 18;
+    } else if (e.type === 'fighter') {
+      drawFighter(e, sx, sy, flash);
+      barY = sy - 12;
     } else if (e.type === 'launcher' || e.type === 'swarmer') {
       drawLauncher(e, sx, sy, flash);
       barY = sy - 24;

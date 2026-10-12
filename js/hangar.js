@@ -90,8 +90,8 @@ const HangarScene = {
   },
 
   launch: function () {
-    if (isOverweight()) {                              // น้ำหนักรวมเกิน maxLoad ของลำตัว: ออกรบไม่ได้
-      this.msg = 'OVERWEIGHT  น้ำหนัก ' + calculateTotalWeight() + ' เกิน ' + partsMaxLoad() + ' เปลี่ยนลำตัวหรือถอดพาร์ทหนักก่อน';
+    if (isOverweight()) {                              // น้ำหนักรวมเกิน maxLoad รวม (ลำตัว+ขา+แพ็กหลัง): ออกรบไม่ได้
+      this.msg = 'OVERWEIGHT  น้ำหนัก ' + calculateTotalWeight() + ' เกิน ' + partsMaxLoad() + ' เปลี่ยนลำตัว/ขา/แพ็กหลังหรือถอดพาร์ทหนักก่อน';
       this.msgOk = false;
       this.msgT = 3;
       return;

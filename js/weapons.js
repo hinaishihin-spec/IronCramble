@@ -392,7 +392,7 @@ function drawEnemyShots() {
       ctx.save();
       ctx.translate(sx, s.y);
       ctx.rotate(Math.atan2(s.vy, s.vx));
-      ctx.scale(1.3, 1.3);
+      ctx.scale(1.3 * (s.sc || 1), 1.3 * (s.sc || 1));
       ctx.fillStyle = '#2d343a';
       ctx.beginPath(); ctx.ellipse(0, 0, 9, 5, 0, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#c94a3a';

@@ -155,6 +155,7 @@ function updateFortress(e, dt, pcx, pcy) {
 function bossDefeated(e) {
   const k = enemies.indexOf(e);
   if (k >= 0) enemies.splice(k, 1);
+  if (e.kind === 'bomber') e.x = clamp(e.x, mission.lockX + 20, mission.lockX + W - e.w - 20);   // พังกลางจอ ไม่ใช่นอกจอ
   run.kills++;
   e.mode = 'dead';
   mission.boss = e;

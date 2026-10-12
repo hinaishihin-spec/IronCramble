@@ -574,7 +574,7 @@ function drawHangarScreen(h) {
   const sm = MISSIONS[selectedMission];
   const unlocked = missionUnlocked(selectedMission);
   if (isOverweight()) {
-    drawText('OVERWEIGHT: น้ำหนักรวม ' + calculateTotalWeight() + ' เกินที่ลำตัวรับได้ ' + partsMaxLoad() + '  เปลี่ยนลำตัวหรือถอดพาร์ทก่อนออกรบ', W / 2, 411, fnt(700, 11), '#e0583a', 'center');
+    drawText('OVERWEIGHT: น้ำหนักรวม ' + calculateTotalWeight() + ' เกินที่รับได้ ' + partsMaxLoad() + '  เปลี่ยนลำตัว/ขา/แพ็กหลังหรือถอดพาร์ทก่อนออกรบ', W / 2, 411, fnt(700, 11), '#e0583a', 'center');
   } else if (unlocked) {
     drawText('ศัตรู: ' + missionSummaryText(sm) + '    รางวัลจบด่าน +' + sm.bonusExp + ' EXP  +' + sm.bonusGold + ' CR', W / 2, 411, fnt(400, 11), '#8d978c', 'center');
   } else {
