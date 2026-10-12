@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wanzer Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap">
+<style>
+  /* Layout: single centered game column, canvas first, control legend underneath. One committed dark "hangar" look. */
+  :root {
+    --bg: #161a1e;
+    --panel: #20262c;
+    --line: #333c45;
+    --fg: #d9dfd2;
+    --muted: #8d978c;
+    --olive: #6d7a47;
+    --amber: #e0a526;
+    --font-display: 'Chakra Petch', 'Noto Sans Thai', system-ui, sans-serif;
+    --font-body: 'Chakra Petch', 'Noto Sans Thai', system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    padding-inline: 16px;
+    padding-block: 24px 40px;
+  }
+  .wrap { max-width: 800px; margin-inline: auto; display: flex; flex-direction: column; gap: 16px; }
+  header { display: flex; flex-direction: column; gap: 2px; }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--amber);
+    text-wrap: balance;
+  }
+  header p { margin: 0; color: var(--muted); }
+  #game {
+    display: block;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    aspect-ratio: 800 / 450;
+    background: #0f1316;
+    border: 1px solid var(--line);
+    cursor: none;
+    outline: none;
+    touch-action: none;
+  }
+  #game:focus-visible { border-color: var(--amber); }
+  .keys {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px 16px;
+  }
+  .keys li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  kbd {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    padding: 1px 8px;
+    min-width: 1.4em;
+    text-align: center;
+    color: var(--fg);
+  }
+  .keys span { color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Wanzer Prototype</h1>
+    <p>ต้นแบบเกม Side-Scrolling Mecha Action สไตล์ Gun Hazard</p>
+  </header>
+
+  <canvas id="game" width="800" height="450" tabindex="0" aria-label="หน้าจอเกม Wanzer Prototype"></canvas>
+
+  <ul class="keys">
+    <li><kbd>A</kbd><kbd>D</kbd><span>เดินซ้าย / ขวา</span></li>
+    <li><kbd>W</kbd><kbd>Space</kbd><span>กระโดด / กดค้างกลางอากาศเพื่อบิน</span></li>
+    <li><kbd>E</kbd><span>+ A / D พุ่งตัว (Dash)</span></li>
+    <li><kbd>Q</kbd><span>กดค้างเพื่อกางโล่ (ลดดาเมจ 80% เดินช้าลง ยิงไม่ได้)</span></li>
+    <li><kbd>เมาส์</kbd><span>เล็ง 360 องศา คลิกซ้าย = ยิงปืน คลิกขวา = ยิงมิสไซล์ (ยิงพร้อมกันได้)</span></li>
+    <li><kbd>F</kbd><span>ยิงมิสไซล์ (สำรองสำหรับเมาส์ที่ไม่มีปุ่มขวา)</span></li>
+    <li><kbd>1</kbd>–<kbd>8</kbd><span>ใน Hangar: เปลี่ยนหมวด (หัว / ลำตัว / แขน / ขา / แพ็กหลัง / ไหล่ / ปืน / มิสไซล์)</span></li>
+    <li><kbd>Q</kbd>–<kbd>P</kbd><span>ใน Hangar: ซื้อและสวมรายการที่ 1–10 (หรือคลิกเมาส์)</span></li>
+    <li><kbd>A</kbd><kbd>D</kbd><span>ใน Hangar: เลือกด่าน · <kbd>Enter</kbd> = LAUNCH</span></li>
+    <li><kbd>R</kbd><span>ลองใหม่เมื่อหุ่นพัง</span></li>
+    <li><kbd>Esc</kbd><span>กลับเมนูหลัก</span></li>
+  </ul>
+</main>
+
+<!-- ลำดับการโหลดสำคัญ: main.js ต้องอยู่ท้ายสุด -->
+<script src="js/config.js"></script>
+<script src="js/parts.js"></script>
+<script src="js/weapondb.js"></script>
+<script src="js/save.js"></script>
+<script src="js/upgrades.js"></script>
+<script src="js/input.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/world.js"></script>
+<script src="js/items.js"></script>
+<script src="js/player.js"></script>
+<script src="js/enemy.js"></script>
+<script src="js/enemy2.js"></script>
+<script src="js/enemy3.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/boss.js"></script>
+<script src="js/boss2.js"></script>
+<script src="js/missions.js"></script>
+<script src="js/mission.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/hangar.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
