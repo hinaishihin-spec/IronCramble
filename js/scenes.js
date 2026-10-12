@@ -39,16 +39,17 @@ const MenuScene = {
     this.confirmReset = 0;
     this.scroll = 0;
     this.buttons = [
-      { x: 250, y: 316, w: 300, h: 40, label: 'START MISSION', hint: 'Enter', action: function () { Scenes.go('hangar'); } },
+      { x: 250, y: 308, w: 300, h: 36, label: 'START MISSION', hint: 'Enter', action: function () { Scenes.go('hangar'); } },
+      { x: 250, y: 349, w: 300, h: 36, label: 'SAVE SLOTS', hint: 'S', action: function () { Scenes.go('saves'); } },
       {
-        x: 250, y: 364, w: 300, h: 40, hint: 'N',
-        label: function () { return MenuScene.confirmReset > 0 ? 'กดอีกครั้งเพื่อล้างเซฟ' : 'NEW GAME  (ล้างเซฟ)'; },
+        x: 250, y: 390, w: 300, h: 36, hint: 'N',
+        label: function () { return MenuScene.confirmReset > 0 ? 'กดอีกครั้งเพื่อล้างเซฟ' : 'NEW GAME  (ล้าง SLOT ' + Save.slot + ')'; },
         action: function () { MenuScene.askReset(); }
       }
     ];
   },
   askReset: function () {
-    if (this.confirmReset > 0) { Save.reset(profile); this.confirmReset = 0; }
+    if (this.confirmReset > 0) { Save.reset(profile); selectedMission = -1; this.confirmReset = 0; }
     else this.confirmReset = 3;
   },
   update: function (dt) {
@@ -64,6 +65,7 @@ const MenuScene = {
   },
   keydown: function (e) {
     if (e.code === 'Enter' || e.code === 'Space') Scenes.go('hangar');
+    else if (e.code === 'KeyS') Scenes.go('saves');
     else if (e.code === 'KeyN') this.askReset();
   },
   mousedown: function () {
@@ -150,4 +152,4 @@ const CompleteScene = {
   }
 };
 
-Scenes.registry = { menu: MenuScene, hangar: HangarScene, play: PlayScene, complete: CompleteScene };
+Scenes.registry = { menu: MenuScene, hangar: HangarScene, play: PlayScene, complete: CompleteScene, saves: SaveScene };

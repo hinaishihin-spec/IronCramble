@@ -261,7 +261,7 @@ function drawMenuScreen(buttons, hover) {
   ctx.strokeStyle = '#333c45';
   ctx.lineWidth = 1;
   ctx.strokeRect(px + 0.5, py + 0.5, pw - 1, ph - 1);
-  drawText('PILOT', px + 16, py + 22, fnt(600, 11), '#8d978c');
+  drawText('PILOT   SLOT ' + Save.slot, px + 16, py + 22, fnt(600, 11), '#8d978c');
   drawText('LV ' + profile.level, px + 16, py + 52, fnt(700, 26), '#e0a526');
   const need = expToNext(profile.level);
   drawText('EXP ' + profile.exp + ' / ' + need, px + 100, py + 40, fnt(600, 11), '#5aa9ff');
@@ -282,7 +282,7 @@ function drawMenuScreen(buttons, hover) {
   if (!Save.usable) {
     drawText('เบราว์เซอร์นี้เซฟอัตโนมัติไม่ได้ ความคืบหน้าจะหายเมื่อรีเฟรชหน้า', W / 2, 438, fnt(400, 12), '#e0583a', 'center');
   } else {
-    drawText('เซฟอัตโนมัติ: เลเวลและเครดิตจะอยู่ต่อแม้รีเฟรชหน้า', W / 2, 438, fnt(400, 12), '#8d978c', 'center');
+    drawText('เซฟอัตโนมัติลง SLOT ' + Save.slot + '  (เปลี่ยนช่อง/สำรองไฟล์ที่ SAVE SLOTS)', W / 2, 438, fnt(400, 12), '#8d978c', 'center');
   }
 }
 
