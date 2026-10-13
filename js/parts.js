@@ -14,13 +14,13 @@ const WANZER_PARTS = {
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 0, weight: 0 },
     { id: "zeriot_1", name: "Zeriot I", price: 150, hpBonus: 10, weight: 5 },
     { id: "zeriot_2", name: "Zeriot II", price: 300, hpBonus: 25, weight: 8 },
-    { id: "hammer_1", name: "Hammer I", price: 200, hpBonus: 40, weight: 20 },
+    { id: "hammer_1", name: "Hammer I", price: 200, hpBonus: 40, weight: 20, spriteUrl: "assets/parts/head_hammer.png" },
 	{ id: "megaz", name: "MegaZ", price: 1000, hpBonus: 100, weight: 40, spriteUrl: "assets/parts/head_megaz.png" }
   ],
   BODY: [
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 0, energy: 100, maxLoad: 30 },
     { id: "zeriot_1", name: "Zeriot I", price: 250, hpBonus: 30, energy: 100, maxLoad: 50 },
-    { id: "hammer_1", name: "Hammer I", price: 350, hpBonus: 70, energy: 70, maxLoad: 80 },
+    { id: "hammer_1", name: "Hammer I", price: 350, hpBonus: 70, energy: 70, maxLoad: 80, spriteUrl: "assets/parts/body_hammer.png" },
 	{ id: "megaz", name: "MegaZ", price: 1000, hpBonus: 100, energy: 100, maxLoad: 100, spriteUrl: "assets/parts/body_megaz.png" }
   ],
   ARMS: [
@@ -45,6 +45,7 @@ const WANZER_PARTS = {
     { id: "basic", name: "Basic Block", price: 0, boostDuration: 3.0, weight: 0, maxLoad: 0 },
     { id: "vernier_1", name: "Vernier I", price: 200, boostDuration: 4.0, weight: 8, maxLoad: 15 },
     { id: "turbo_1", name: "Turbo I", price: 350, boostDuration: 5.5, weight: 15, maxLoad: 25 },
+	{ id: "hammer_1", name: "Hammer", price: 400, boostDuration: 6.0, weight: 23, maxLoad: 30, spriteUrl: "assets/parts/backpack_hammer.png" },
 	{ id: "megaz", name: "MegaZ", price: 1000, boostDuration: 7.5, weight: 30, maxLoad: 50 }
   ]
 };
