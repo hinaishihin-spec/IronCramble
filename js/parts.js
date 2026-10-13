@@ -26,7 +26,7 @@ const WANZER_PARTS = {
   ARMS: [
     { id: "basic", name: "Basic Block", price: 0, damageBonus: 1.0, weight: 0 },
     { id: "zeriot_1", name: "Zeriot I", price: 150, damageBonus: 1.05, weight: 8 },
-    { id: "hammer_1", name: "Hammer I", price: 200, damageBonus: 1.15, weight: 15 },
+    { id: "hammer_1", name: "Hammer I", price: 200, damageBonus: 1.15, weight: 15, spriteUrl: "assets/parts/arms_hammer.png" },
 	{ id: "megaz", name: "MegaZ", price: 1000, damageBonus: 2.0, weight: 30, spriteUrl: "assets/parts/arms_megaz.png" }
   ],
   LEGS: [
