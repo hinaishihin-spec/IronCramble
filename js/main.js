@@ -10,6 +10,7 @@ function frame(now) {
   const dt = Math.min(0.05, (now - lastTime) / 1000);   // จำกัด dt กันเกมกระโดดเมื่อแท็บถูกพักไว้
   lastTime = now;
   tickFps(dt);
+  pollGamepad(dt);                                      // จอยเกมแพด: เขียนสถานะลง keys/mouse ก่อนอัปเดตฉาก
   Scenes.update(dt);
   Scenes.render();
   requestAnimationFrame(frame);
