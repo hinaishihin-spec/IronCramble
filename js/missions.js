@@ -9,6 +9,7 @@
                units = [ [ชนิด, ระยะห่างจากขอบจอขวา(px), ความสูง(เฉพาะ drone)], ... ]
                ชนิด: 'walker' | 'drone' | 'tank' | 'chopper' | 'sniper'
                | 'bomber' (ตัวเลขที่ 3 = ความสูงบิน) | 'launcher' (รถมิสไซล์ลูกเดียว) | 'swarmer' (รถมิสไซล์ฝูง)
+               | 'monolet' (หุ่นนกกระจอกเทศยิงเลเซอร์ กระโดดยิง) | 'tplane' (เครื่องบินล่องหนโฉบทิ้งระเบิด ตัวเลขที่ 3 = ความสูงบิน)
                (sniper: ตัวเลขที่ 2 = เยื้องเข้าซ้ายจากขอบจอขวา เมื่อมีสไนเปอร์หลายตัวในเวฟเดียว)
    boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber' }
                ด่านที่มีบอส: จบเมื่อกำจัดบอสได้ (เวฟทั้งหมดต้องอยู่ก่อนระยะ at)
@@ -88,10 +89,30 @@ const MISSIONS = [
       { at: 1130, units: [['bomber', 0, 90], ['swarmer', 100], ['launcher', 200], ['chopper', 60]] },
       { at: 1230, units: [['bomber', 0, 80], ['bomber', 160, 105], ['swarmer', 60]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1300 m)
     ]
+  },
+  {
+    id: 6, title: 'GHOST LINE', name: 'MISSION 06  GHOST LINE',
+    lengthM: 1600, unlockAt: 5, bonusExp: 500, bonusGold: 1000,
+    // ยังไม่มีบอส (จบเมื่อกำจัดศัตรูครบทุกเวฟ) จะเพิ่ม boss: { at: 1500, name: '...', kind: '...' } ทีหลังได้
+    waves: [
+      { at: 60,   units: [['monolet', 0], ['walker', 90]] },
+      { at: 170,  units: [['monolet', 0], ['monolet', 140], ['drone', 100, 150]] },
+      { at: 290,  units: [['tplane', 0, 82]] },                                     // เครื่องล่องหนลำแรก: สอนให้ใช้มิสไซล์
+      { at: 400,  units: [['monolet', 0], ['launcher', 120], ['walker', 80]] },
+      { at: 520,  units: [['tplane', 0, 85], ['monolet', 150]] },
+      { at: 640,  units: [['tank', 0], ['monolet', 140], ['sniper', 0]] },
+      { at: 760,  units: [['tplane', 0, 82], ['tplane', 260, 108]] },
+      { at: 880,  units: [['monolet', 0], ['monolet', 120], ['swarmer', 200]] },
+      { at: 1000, units: [['tplane', 0, 85], ['launcher', 100], ['chopper', 60]] },
+      { at: 1120, units: [['monolet', 0], ['monolet', 110], ['monolet', 220], ['drone', 60, 140]] },
+      { at: 1240, units: [['tplane', 0, 82], ['monolet', 140], ['swarmer', 80], ['sniper', 0]] },
+      { at: 1360, units: [['tplane', 0, 85], ['tplane', 220, 108], ['monolet', 120], ['monolet', 240]] },
+      { at: 1470, units: [['monolet', 0], ['monolet', 130], ['tplane', 60, 90], ['tank', 220]] }
+    ]
   }
 ];
 
-const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', boss: 'BOSS' };
+const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', monolet: 'Monolet Bot', tplane: 'Tactical Plane', boss: 'BOSS' };
 
 // ---------- การเลือกด่าน (ค่าอยู่ในหน่วยความจำ ไม่ได้เซฟ) ----------
 let selectedMission = -1;            // -1 = ยังไม่ได้เลือก -> Hangar จะเลือกด่านล่าสุดที่ปลดล็อกให้
@@ -115,7 +136,7 @@ function currentMission() { ensureValidSelection(); return MISSIONS[selectedMiss
 
 // นับศัตรูทั้งหมดของด่าน แยกตามชนิด เช่น { walker: 2, drone: 2, tank: 0, boss: 0, total: 4 } (บอสนับเป็น 1 ตัว)
 function missionTotals(m) {
-  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, boss: 0, total: 0 };
+  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, monolet: 0, tplane: 0, boss: 0, total: 0 };
   for (const w of m.waves) for (const u of w.units) { t[u[0]]++; t.total++; }
   if (m.boss) { t.boss = 1; t.total++; }
   return t;
@@ -125,7 +146,7 @@ function missionTotals(m) {
 function missionSummaryText(m) {
   const t = missionTotals(m);
   const parts = [];
-  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
+  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer', 'monolet', 'tplane']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
   if (m.boss) parts.push(/^BOSS/.test(m.boss.name) ? m.boss.name : 'BOSS ' + m.boss.name);
   return parts.join(' / ');
 }

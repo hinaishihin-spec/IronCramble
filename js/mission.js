@@ -57,6 +57,8 @@ function spawnWave(wave) {
     else if (kind === 'drone') e = makeDrone(baseX + off, y || 150);
     else if (kind === 'chopper') e = makeChopper(baseX + off);
     else if (kind === 'bomber') e = makeBomber(baseX + off, y || BOMBER_Y);          // ตัวเลขที่ 3 = ความสูงบิน
+    else if (kind === 'monolet') e = makeMonolet(baseX + off);
+    else if (kind === 'tplane') e = makeTPlane(baseX + off, y || TPLANE_Y);          // ตัวเลขที่ 3 = ความสูงบิน
     else if (kind === 'launcher') e = makeLauncher(baseX + off, false);
     else if (kind === 'swarmer') e = makeLauncher(baseX + off, true);
     else if (kind === 'sniper') { e = makeSniper(baseX); e.slot = off; }   // off = เยื้องเข้าซ้ายจากขอบจอขวา

@@ -27,6 +27,7 @@
   levelup
   enemy_shot
   tank_shell
+  enemy_laser
   snipe_shot
   bomb_drop
   bomber_pass

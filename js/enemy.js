@@ -8,7 +8,7 @@
 
 let enemies = [];
 
-const ENEMY_EXP = { walker: 30, drone: 20, tank: 60, chopper: 55, sniper: 45, bomber: 70, launcher: 60, swarmer: 55 };
+const ENEMY_EXP = { walker: 30, drone: 20, tank: 60, chopper: 55, sniper: 45, bomber: 70, launcher: 60, swarmer: 55, monolet: 75, tplane: 90 };
 
 function resetEnemies() { enemies = []; }
 
@@ -28,7 +28,8 @@ function makeTank(x) {
 function nearestEnemy(x, y) {
   let best = null, bd = Infinity;
   for (const e of enemies) {
-    const d = Math.hypot(e.x + e.w / 2 - x, e.y + e.h / 2 - y);
+    let d = Math.hypot(e.x + e.w / 2 - x, e.y + e.h / 2 - y);
+    if (untargetable(e)) d *= 0.3;                      // ล็อกเป้า: มิสไซล์เลือกเครื่องล่องหนก่อน (อาวุธอื่นโดนไม่ได้)
     if (d < bd) { bd = d; best = e; }
   }
   return best;
@@ -53,7 +54,7 @@ function damageEnemy(e, dmg, heavy, ignoreArmor) {
 }
 
 function knockEnemy(e, dx, dy) {
-  if (e.type === 'boss' || e.type === 'chopper' || e.type === 'sniper' || e.type === 'bomber' || e.type === 'fighter') return;   // บอส/เฮลิคอปเตอร์/สไนเปอร์ไม่โดนผลัก
+  if (e.type === 'boss' || e.type === 'chopper' || e.type === 'sniper' || e.type === 'bomber' || e.type === 'fighter' || e.type === 'tplane') return;   // บอส/เฮลิคอปเตอร์/สไนเปอร์ไม่โดนผลัก
   const k = (e.type === 'tank' || e.type === 'launcher' || e.type === 'swarmer') ? 0.2 : 1;           // รถถังหนัก ถูกผลักได้น้อยมาก
   e.kx = dx * KNOCKBACK * k;
   if (e.type === 'drone') e.ky = dy * KNOCKBACK * 0.6;
@@ -63,7 +64,7 @@ function killEnemy(e) {
   if (e.type === 'boss') { bossDefeated(e); return; }   // บอสมีฉากพังของตัวเอง (boss.js)
   explode(e);
   if (e.type === 'tank') addShake(6);
-  else if (e.type === 'bomber' || e.type === 'launcher' || e.type === 'swarmer') addShake(4);
+  else if (e.type === 'bomber' || e.type === 'launcher' || e.type === 'swarmer' || e.type === 'tplane') addShake(4);
   if (!e.minion) run.kills++;                           // โดรนลูกน้องบอสไม่นับในยอดศัตรูของด่าน
   if (!player.dead && !e.minion) {
     const xp = ENEMY_EXP[e.type] || 20;
@@ -87,6 +88,8 @@ function updateEnemies(dt) {
     if (e.type === 'chopper') { updateChopper(e, dt, pcx, pcy); continue; }     // enemy2.js
     if (e.type === 'sniper') { updateSniper(e, dt, pcx, pcy); continue; }       // enemy2.js
     if (e.type === 'bomber') { updateBomber(e, dt, pcx, pcy); continue; }       // enemy3.js
+    if (e.type === 'monolet') { updateMonolet(e, dt, pcx, pcy); continue; }     // enemy4.js
+    if (e.type === 'tplane') { updateTPlane(e, dt, pcx, pcy); continue; }       // enemy4.js
     if (e.type === 'fighter') { updateFighter(e, dt, pcx, pcy); continue; }     // boss3.js (ลูกน้อง Giant Bomber)
     if (e.type === 'launcher' || e.type === 'swarmer') { updateLauncher(e, dt, pcx, pcy); continue; }   // enemy3.js
 
@@ -263,6 +266,12 @@ function drawEnemies() {
     } else if (e.type === 'bomber') {
       drawBomber(e, sx, sy, flash);
       barY = sy - 18;
+    } else if (e.type === 'monolet') {
+      drawMonolet(e, sx, sy, flash);
+      barY = sy - 12;
+    } else if (e.type === 'tplane') {
+      drawTPlane(e, sx, sy, flash);
+      barY = sy - 18;
     } else if (e.type === 'fighter') {
       drawFighter(e, sx, sy, flash);
       barY = sy - 12;
@@ -296,6 +305,7 @@ function drawEnemies() {
       barY = sy - 18;
     }
 
+    if (untargetable(e)) continue;                        // ล่องหนอยู่: ไม่โชว์หลอด HP
     // HP bar เหนือหัวศัตรู
     const ratio = clamp(e.hp / e.maxHp, 0, 1);
     const bx = sx + e.w / 2 - 20;

@@ -121,6 +121,7 @@ const Sfx = (function () {
     levelup:      function (t, d, r) { [523, 659, 784, 1047].forEach(function (f, i) { osc('triangle', f, f, t + i * 0.09, 0.22, 0.28, d); }); },
     enemy_shot:   function (t, d, r) { osc('square', 420 * r, 200, t, 0.07, 0.12, d); nz('bandpass', 2200, 1000, t, 0.05, 0.12, d); },
     tank_shell:   function (t, d, r) { osc('sawtooth', 100, 38, t, 0.38, 0.6, d); nz('lowpass', 900, 150, t, 0.32, 0.7, d); },
+    enemy_laser:  function (t, d, r) { osc('sawtooth', 1700 * r, 520, t, 0.09, 0.15, d); osc('square', 2400 * r, 900, t, 0.06, 0.07, d); },
     snipe_shot:   function (t, d, r) { nz('bandpass', 3800, 300, t, 0.3, 0.9, d, 0.8); osc('sawtooth', 520, 45, t, 0.25, 0.6, d); },
     bomb_drop:    function (t, d, r) { osc('sine', 950, 280, t, 0.55, 0.14, d); },
     bomber_pass:  function (t, d, r) { nz('bandpass', 180, 620, t, 1.1, 0.28, d, 1.2); osc('sawtooth', 70, 95, t, 1.0, 0.1, d); },
@@ -263,7 +264,7 @@ const Sfx = (function () {
   explode = function (e) {
     _explode(e);
     try {
-      const big = e.type === 'tank' || e.type === 'bomber' || e.type === 'launcher' || e.type === 'swarmer' || e.type === 'boss';
+      const big = e.type === 'tank' || e.type === 'bomber' || e.type === 'launcher' || e.type === 'swarmer' || e.type === 'boss' || e.type === 'tplane';
       Sfx.play(big ? 'explosion_big' : 'explosion_small', { vol: screenVol(e.x + e.w / 2) * (big ? 0.9 : 0.8), rate: 0.9 + Math.random() * 0.2 });
     } catch (er) { }
   };
@@ -327,7 +328,7 @@ const Sfx = (function () {
   // ----- เฝ้าดูสถานะทุกเฟรม (เดิน กระโดด ลงพื้น แดช โล่ ไอพ่น เลเซอร์ ศัตรูยิง ฯลฯ) -----
   const st = { onGround: true, dashT: 0, shieldUp: false, broken: false, dead: false, stepIdx: 0, bossWarn: 0, banner: 0, hover: -1, scene: null, land: 0 };
   const seenShots = new Map(), seenMissiles = new Map(), seenEnemies = new WeakSet(), p2 = new WeakSet();
-  const SHOT_SOUND = { bmissile: 'missile', hmg: 'enemy_shot', snipe: 'snipe_shot', bomb: 'bomb_drop' };
+  const SHOT_SOUND = { bmissile: 'missile', hmg: 'enemy_shot', snipe: 'snipe_shot', bomb: 'bomb_drop', laser: 'enemy_laser' };
 
   window.sfxUpdate = function (dt) {
     Sfx.tickToast(dt);
@@ -371,7 +372,7 @@ const Sfx = (function () {
 
     // ศัตรู: โผล่ใหม่ / บอสเข้าเฟส 2
     for (const e of enemies) {
-      if (!seenEnemies.has(e)) { seenEnemies.add(e); if (e.type === 'bomber') Sfx.play('bomber_pass', { vol: 0.8 }); }
+      if (!seenEnemies.has(e)) { seenEnemies.add(e); if (e.type === 'bomber') Sfx.play('bomber_pass', { vol: 0.8 }); else if (e.type === 'tplane') Sfx.play('bomber_pass', { vol: 0.35, rate: 1.4 }); }
       if (e.type === 'boss' && e.phase2Hp && e.hp <= e.phase2Hp && !p2.has(e) && e.mode !== 'intro') { p2.add(e); Sfx.play('boss_phase2'); }
     }
 

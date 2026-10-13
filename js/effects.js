@@ -43,7 +43,7 @@ function smallBoom(x, y, r) {
 // ระเบิดวงกลมซ้อนกัน ใช้ทั้งกับศัตรูและผู้เล่น (ต้องมี x, y, w, h, type)
 function explode(e) {
   const cx = e.x + e.w / 2, cy = e.y + e.h / 2;
-  const size = e.type === 'walker' ? 1 : (e.type === 'tank' ? 1.6 : (e.type === 'chopper' ? 1.2 : (e.type === 'bomber' ? 1.4 : (e.type === 'launcher' || e.type === 'swarmer' ? 1.5 : 0.75))));
+  const size = e.type === 'walker' ? 1 : (e.type === 'tank' ? 1.6 : (e.type === 'chopper' ? 1.2 : (e.type === 'bomber' || e.type === 'tplane' ? 1.4 : (e.type === 'monolet' ? 1.0 : (e.type === 'launcher' || e.type === 'swarmer' ? 1.5 : 0.75)))));
   for (let k = 0; k < 4; k++) {
     effects.push({
       x: cx + (Math.random() - 0.5) * e.w * 0.8,

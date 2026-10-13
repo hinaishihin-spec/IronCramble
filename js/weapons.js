@@ -93,6 +93,7 @@ function meleeSwing(p, g, dmg) {
     const bx0 = Math.min(o.x - dir * 6, o.x + dir * reach), bx1 = Math.max(o.x - dir * 6, o.x + dir * reach);
     const by0 = o.y - (g.hitH || 36) / 2, by1 = o.y + (g.hitH || 36) / 2;
     for (const e of enemies.slice()) {
+      if (untargetable(e)) continue;
       if (e.x > bx1 || e.x + e.w < bx0 || e.y > by1 || e.y + e.h < by0) continue;
       impact(Math.max(bx0, Math.min(e.x + e.w / 2, bx1)), Math.max(by0, Math.min(e.y + e.h / 2, by1)), -ca, -sa);
       const killed = damageEnemy(e, dmg, false);
@@ -101,6 +102,7 @@ function meleeSwing(p, g, dmg) {
     }
   }
   for (const e of thrust ? [] : enemies.slice()) {
+    if (untargetable(e)) continue;
     const nx = Math.max(e.x, Math.min(o.x, e.x + e.w)), ny = Math.max(e.y, Math.min(o.y, e.y + e.h));   // จุดบนกรอบศัตรูที่ใกล้มือที่สุด
     const d = Math.hypot(nx - o.x, ny - o.y);
     if (d > reach) continue;
@@ -186,6 +188,7 @@ function updateLaser(dt) {
   const dmg = Math.max(1, Math.round(lg.damage * (LASER_TICK / (lg.fireRate / 1000)) * atkMult()));
   for (const b of beam) {
     for (const e of enemies.slice()) {           // ลำแสงทะลุ โดนทุกตัวบนเส้น (แต่ละเส้นทำดาเมจแยกกัน)
+      if (untargetable(e)) continue;               // เครื่องล่องหน: ลำแสงทะลุผ่าน
       const d = beamHitDist(b, e, b.len, b.ca, b.sa);
       if (d >= 0) {
         impact(b.x0 + b.ca * d, b.y0 + b.sa * d, -b.ca, -b.sa);
@@ -220,6 +223,7 @@ function updateBullets(dt) {
       const sy = y0 + (b.y - y0) * s / steps;
       for (let j = 0; j < enemies.length; j++) {
         const e = enemies[j];
+        if (untargetable(e)) continue;                                   // เครื่องล่องหน: กระสุนทะลุผ่าน
         if (b.hitList && b.hitList.indexOf(e) >= 0) continue;           // กระสุนทะลุ: ไม่โดนตัวเดิมซ้ำ
         if (sx >= e.x && sx <= e.x + e.w && sy >= e.y && sy <= e.y + e.h) {
           const bl = Math.hypot(b.vx, b.vy) || 1;
@@ -427,6 +431,17 @@ function drawEnemyShots() {
       ctx.strokeStyle = '#fff2ee';
       ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(sx - s.vx / mag * 36, s.y - s.vy / mag * 36); ctx.lineTo(sx, s.y); ctx.stroke();
+      continue;
+    }
+    if (s.kind === 'laser') {                          // เลเซอร์ Monolet: เส้นสั้นสีเขียวมิ้นต์ (ต่างจากเลเซอร์ผู้เล่นสีชมพู)
+      const mag = Math.hypot(s.vx, s.vy) || 1;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(80,255,210,0.35)';
+      ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(sx - s.vx / mag * 34, s.y - s.vy / mag * 34); ctx.lineTo(sx, s.y); ctx.stroke();
+      ctx.strokeStyle = '#eafff9';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(sx - s.vx / mag * 22, s.y - s.vy / mag * 22); ctx.lineTo(sx, s.y); ctx.stroke();
       continue;
     }
     if (s.kind === 'hmg') {                            // ปืนกลหนักของบอส: กระสุนเส้นยาวสีส้ม

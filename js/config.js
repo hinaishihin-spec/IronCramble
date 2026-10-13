@@ -251,3 +251,30 @@ const FIGHTER_SPEED = 280;
 const FIGHTER_SHOT_DMG = 5;
 const FIGHTER_SHOT_SPEED = 400;
 const FIGHTER_BURST_CD = 1.7;
+
+// ศัตรูด่าน 06 (enemy4.js): Monolet Bot (หุ่นนกกระจอกเทศหัวปืนเลเซอร์ กระโดดยิงได้) + Tactical Plane (เครื่องบินล่องหนโฉบทิ้งระเบิด)
+const MONO_W = 42, MONO_H = 72;
+const MONO_HP = 130;
+const MONO_ARMOR = 0.1;
+const MONO_SPEED = 105;            // px/s วิ่งเร็วกว่าหุ่นเดินดินเกือบเท่าตัว
+const MONO_PREF_MIN = 250;         // ใกล้กว่านี้จะถอยหลังเว้นระยะ
+const MONO_PREF_MAX = 430;         // ไกลกว่านี้จะวิ่งเข้าหา
+const MONO_ACT_MIN = 1.5, MONO_ACT_MAX = 2.8;   // เวลาก่อนเลือกท่าถัดไป (กระโดดยิง / ยืนชาร์จยิง)
+const MONO_JUMP_VY = 560, MONO_JUMP_VX = 170, MONO_GRAV = 1500;
+const MONO_WINDUP = 0.5;           // ยืนชาร์จ: ปากกระบอกเรืองแสงเตือนก่อนยิง
+const MONO_BURST = 3;              // ยิงยืน: เลเซอร์ต่อเนื่องกี่นัด
+const MONO_HOP_SHOTS = 2;          // ยิงกลางอากาศกี่นัด (เริ่มที่จุดสูงสุดของการกระโดด)
+const MONO_BURST_GAP = 0.13;
+const MONO_LASER_SPEED = 620;
+const MONO_LASER_DMG = 9;
+const MONO_LASER_SHIELD = 7;
+
+const TPLANE_W = 92, TPLANE_H = 22;
+const TPLANE_HP = 95;
+const TPLANE_Y = 82;               // ความสูงบินปกติ (ค่าที่ 3 ในเวฟกำหนดได้)
+const TPLANE_DIVE = 26;            // โฉบลงต่ำเมื่อเข้าใกล้ผู้เล่น (px)
+const TPLANE_SPEED = 255;
+const TPLANE_ACCEL = 420;
+const TPLANE_OVERSHOOT = 380;
+const TPLANE_BOMB_CD = 0.22;
+const TPLANE_REVEAL = 1.5;         // วินาทีที่เห็นตัวเต็มและโดนปืนได้หลังเปิดช่องระเบิด (นอกนั้นล่องหน: โดนได้แค่มิสไซล์ล็อกเป้า)
