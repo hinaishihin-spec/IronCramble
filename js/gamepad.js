@@ -27,12 +27,15 @@ const PAD = {
   fire: false, missile: false,
   aimX: 1, aimY: 0, aiming: false,
   lastScene: null,
-  toast: '', toastT: 0
+  toast: '', toastT: 0,
+  err: '', id: '', mapping: '', lastBtn: -1, lastBtnT: 0
 };
 
 function padGet() {
-  if (!navigator.getGamepads) return null;
-  const list = navigator.getGamepads();
+  if (!navigator.getGamepads) { PAD.err = 'no-api'; return null; }
+  let list;
+  try { list = navigator.getGamepads(); } catch (e) { PAD.err = 'blocked'; return null; }   // อยู่ใน iframe ที่ไม่อนุญาตจอย
+  PAD.err = '';
   for (let i = 0; i < list.length; i++) if (list[i] && list[i].connected) return list[i];
   return null;
 }
@@ -78,7 +81,8 @@ function padAxis(v) { return Math.abs(v) < PAD.DEAD ? 0 : v; }
 function pollGamepad(dt) {
   if (PAD.toastT > 0) PAD.toastT -= dt;
   const gp = padGet();
-  if (!gp) { if (PAD.active) { PAD.active = false; padRelease(); } PAD.prev = []; return; }
+  if (gp && gp.id !== PAD.id) { PAD.id = gp.id; PAD.mapping = gp.mapping; PAD.toast = 'GAMEPAD  ' + (gp.id || '').slice(0, 34); PAD.toastT = 2.5; }
+  if (!gp) { PAD.id = ''; if (PAD.active) { PAD.active = false; padRelease(); } PAD.prev = []; return; }
   const b = gp.buttons, n = b.length;
   const down = function (i) { return i < n && (b[i].pressed || b[i].value > 0.5); };
   const trig = function (i) { return i < n && (b[i].pressed || b[i].value > 0.35); };
@@ -88,6 +92,8 @@ function pollGamepad(dt) {
   const dUp = down(12), dDown = down(13), dLeft = down(14), dRight = down(15);
   const anyInput = lx || ly || rx || ry || b.some(function (x) { return x.pressed; });
   if (anyInput) PAD.active = true;
+  for (let i = 0; i < n; i++) if (down(i) && !PAD.prev[i]) { PAD.lastBtn = i; PAD.lastBtnT = 2; }
+  if (PAD.lastBtnT > 0) PAD.lastBtnT -= dt;
   const sc = Scenes.current;
   if (sc !== PAD.lastScene) {                         // เปลี่ยนฉาก: ปล่อยปุ่มค้างและตั้งทิศเล็งเริ่มต้นตามทิศหุ่น
     padRelease();
@@ -147,7 +153,21 @@ function pollGamepad(dt) {
 }
 
 // แจ้งเตือนมุมจอเมื่อจอยเชื่อมต่อ
+function drawGamepadStatus() {                        // แถบสถานะจอยมุมซ้ายล่าง แสดงเฉพาะในเมนู (ไว้ตรวจว่าเบราว์เซอร์เห็นจอยไหม)
+  if (Scenes.current === PlayScene) return;
+  let t, c = '#8d978c';
+  if (PAD.err === 'blocked') { t = 'จอยถูกบล็อก: เปิดเกมในแท็บเต็ม/ไฟล์ html ของคุณเอง (ไม่ใช่ใน iframe)'; c = '#e0583a'; }
+  else if (PAD.err === 'no-api') { t = 'เบราว์เซอร์นี้ไม่รองรับจอย'; c = '#e0583a'; }
+  else if (!PAD.id) t = 'ไม่พบจอย: กดปุ่มบนจอยหนึ่งครั้ง (ถ้ายังไม่ขึ้น ลองเสียบใหม่/ปิดโปรแกรมอื่นที่ใช้จอย)';
+  else {
+    t = 'จอย: ' + PAD.id.slice(0, 40) + (PAD.mapping === 'standard' ? '' : '  [ไม่ใช่มาตรฐาน ปุ่มอาจเพี้ยน]') + (PAD.lastBtnT > 0 ? '   ปุ่ม ' + PAD.lastBtn : '');
+    c = PAD.mapping === 'standard' ? '#5fd36f' : '#e0a526';
+  }
+  drawText(t, 8, H - 8, fnt(400, 10), c, 'left');
+}
+
 function drawGamepadToast() {
+  drawGamepadStatus();
   if (PAD.toastT <= 0) return;
   ctx.save();
   ctx.globalAlpha = Math.min(1, PAD.toastT);
