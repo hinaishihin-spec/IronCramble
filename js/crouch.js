@@ -12,6 +12,7 @@
 const CROUCH = {
   drop: 13,        // ย่อลงกี่พิกเซลเกม (สะโพกเตี้ยลง และกรอบชนเตี้ยลงเท่ากัน)
   speed: 0.45,     // ความเร็วเดินตอนนั่ง (เท่าของปกติ)
+  legScale: 1.25,   // ขยาย/ย่อภาพขาท่านั่ง (1.15 = ใหญ่ขึ้น 15%) กว้างและสูงขยายพร้อมกัน เท้ายังชิดพื้น
   ease: 16         // ความเร็วลงนั่ง/ลุก (ยิ่งมากยิ่งไว)
 };
 
@@ -41,7 +42,7 @@ function crouchLegImage() {
     const base = baseRig(), c = (typeof player !== 'undefined' && Scenes.current === PlayScene) ? player.crouch : 0;
     if (!c) return base;
     const part = findPart('LEGS', profile.equippedParts.LEGS), cr = (part && part.rig && part.rig.crouch) || {};
-    const th = cr.h !== undefined ? cr.h : base.h - CROUCH.drop;
+    const th = cr.h !== undefined ? cr.h : (base.h - CROUCH.drop) * CROUCH.legScale;
     const thip = cr.hip !== undefined ? cr.hip : base.hip - CROUCH.drop;
     const tx = cr.hipX !== undefined ? cr.hipX : base.hipX;
     return Object.assign({}, base, { h: base.h + (th - base.h) * c, hip: base.hip + (thip - base.hip) * c, hipX: base.hipX + (tx - base.hipX) * c });
