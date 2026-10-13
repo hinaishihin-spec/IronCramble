@@ -12,6 +12,7 @@ function frame(now) {
   tickFps(dt);
   pollGamepad(dt);                                      // จอยเกมแพด: เขียนสถานะลง keys/mouse ก่อนอัปเดตฉาก
   Scenes.update(dt);
+  sfxUpdate(dt);                                        // ระบบเสียง: เฝ้าดูสถานะเกมแล้วเล่นเสียง (audio.js)
   Scenes.render();
   requestAnimationFrame(frame);
 }

@@ -19,8 +19,8 @@ assets = {}
 adir = root / "assets"
 if adir.is_dir():
     for f in sorted(adir.rglob("*")):
-        if f.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
-            mime = mimetypes.guess_type(f.name)[0] or "image/png"
+        if f.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp", ".gif", ".ogg", ".mp3", ".wav"):
+            mime = mimetypes.guess_type(f.name)[0] or ("audio/ogg" if f.suffix.lower() == ".ogg" else "image/png")
             assets[f.relative_to(root).as_posix()] = "data:%s;base64,%s" % (mime, base64.b64encode(f.read_bytes()).decode())
 if assets:
     bundle = "const EMBEDDED_ASSETS = " + json.dumps(assets) + ";\n\n" + bundle

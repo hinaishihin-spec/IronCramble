@@ -92,7 +92,7 @@ function pollGamepad(dt) {
   const rx = padAxis(gp.axes[2] || 0), ry = padAxis(gp.axes[3] || 0);
   const dUp = down(12), dDown = down(13), dLeft = down(14), dRight = down(15);
   const anyInput = lx || ly || rx || ry || b.some(function (x) { return x.pressed; });
-  if (anyInput) PAD.active = true;
+  if (anyInput) { PAD.active = true; if (typeof Sfx !== 'undefined') Sfx.unlock(); }
   for (let i = 0; i < n; i++) if (down(i) && !PAD.prev[i]) { PAD.lastBtn = i; PAD.lastBtnT = 2; }
   if (PAD.lastBtnT > 0) PAD.lastBtnT -= dt;
   const sc = Scenes.current;

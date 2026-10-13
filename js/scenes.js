@@ -17,7 +17,7 @@ const Scenes = {
     this.current.enter(data);
   },
   update: function (dt) { this.current.update(dt); },
-  render: function () { this.current.render(); drawCrosshair(); drawGamepadToast(); },
+  render: function () { this.current.render(); drawCrosshair(); drawGamepadToast(); Sfx.drawToast(); },
   keydown: function (e) { if (this.current.keydown) this.current.keydown(e); },
   mousedown: function () { if (this.current.mousedown) this.current.mousedown(); }
 };
