@@ -17,7 +17,7 @@ function freshPlayer() {
     hp: maxHp(), dead: false, hurtFlash: 0,
     equippedParts: profile.equippedParts,   // พาร์ทที่สวมอยู่ (ออบเจกต์เดียวกับในเซฟ)
     equippedWeapon: profile.equippedWeapon,   // { gun: id, missile: id } อาวุธ 2 ช่อง (ออบเจกต์เดียวกับในเซฟ)
-    walkPhase: 0, walkAmt: 0, bob: 0, breathPhase: 0, land: 0, lean: 0,   // จังหวะเดิน (ใช้ในโหมดภาพ: ตัวย่อลง bob พิกเซลเกม)
+    crouch: 0, walkPhase: 0, walkAmt: 0, bob: 0, breathPhase: 0, land: 0, lean: 0,   // จังหวะเดิน (ใช้ในโหมดภาพ: ตัวย่อลง bob พิกเซลเกม)
     swingT: 0, swingDur: 0, swingArc: 0, swingThrust: false, swingAng: 0,   // ท่าฟันของอาวุธประชิด (วินาทีที่เหลือ / ทั้งหมด / มุมกว้าง)
     gunCd: 0, missileCd: 0,         // คูลดาวน์แยกกัน: ปืน (คลิกซ้าย) / มิสไซล์ (คลิกขวา หรือ F)
     podAimT: 0,                      // เวลาที่พอดยังเงยชี้ตามเมาส์หลังยิงมิสไซล์ (วินาที)
@@ -117,6 +117,7 @@ function updatePlayer(dt) {
     spawnSparks(pcx - dir * 20, p.y + p.h, 8, '#8fe3b0');
   }
   const dashing = p.dashT > 0;
+  updateCrouch(p, dt, dashing);                          // S / ลูกศรล่าง = ย่อตัว (ดู crouch.js)
   if (dashing) {
     p.dashT -= dt;
     p.vx = p.dashDir * DASH_SPEED * partsBoostMult();
@@ -124,7 +125,7 @@ function updatePlayer(dt) {
     p.afterTimer -= dt;
     if (p.afterTimer <= 0) { afterimages.push({ x: p.x, y: p.y, life: 0.22 }); p.afterTimer = 0.03; }
   } else {
-    p.vx = dir * MOVE_SPEED * partsSpeedMult() * (p.shieldUp ? SHIELD_SLOW : 1);
+    p.vx = dir * MOVE_SPEED * partsSpeedMult() * (p.shieldUp ? SHIELD_SLOW : 1) * crouchSpeedMult();
   }
   p.x = clamp(p.x + p.vx * dt, 0, WORLD_W - p.w);
 
@@ -359,7 +360,7 @@ function drawMechArt(cxS, feetY, k, f, gunAng, podAng, podSel, flash, noWeapons,
   };
   const flipArt = ART_FACES_LEFT === f;                 // ภาพหันซ้าย + หุ่นหันขวา (หรือกลับกัน) = ต้องพลิกภาพ
   const layer = function (cat) {
-    const img = equippedPartImage(cat);
+    const img = (cat === 'LEGS' && crouchLegImage()) || equippedPartImage(cat);
     if (!img) return;
     const H = cat === 'LEGS' ? lr.h : SPRITE_H[cat], sc = H * k / img.height, pt = place(cat), A = RIG[cat].a;
     ctx.save(); ctx.translate(pt.x, pt.y);

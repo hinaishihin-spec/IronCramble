@@ -7,6 +7,7 @@
    ปุ่มระหว่างเล่น
      สติ๊กซ้าย / D-pad ซ้าย-ขวา  เดิน        สติ๊กขวา  เล็ง 360°
      A (หรือ D-pad ขึ้น)         กระโดด / กดค้างเพื่อบิน
+     สติ๊กซ้าย/D-pad ลง          ย่อตัวนั่ง
      B หรือ RB                   พุ่งตัว Dash (ดันสติ๊กซ้ายไปทิศที่จะพุ่งด้วย)
      LB                          กางโล่ (กดค้าง)
      RT                          ยิงปืน         LT หรือ X  ยิงมิสไซล์
@@ -107,6 +108,7 @@ function pollGamepad(dt) {
     padSetKey('KeyA', lx < -0.35 || dLeft);
     padSetKey('KeyW', down(0) || dUp);
     padSetKey('KeyQ', down(4));
+    padSetKey('KeyS', ly > 0.6 || dDown);               // สติ๊กซ้าย/D-pad ลง = ย่อตัว
     // ----- Dash (ต้องดันทิศเดินค้างไว้ด้วย เหมือน Shift + A/D) -----
     if (edge(1) || edge(5)) player.dashBuffer = 0.15;
     // ----- เล็ง: สติ๊กขวา ตั้งเป้าที่ระยะคงที่รอบหัวไหล่ -----
@@ -127,7 +129,7 @@ function pollGamepad(dt) {
   } else {
     // ----- เมนู: เคอร์เซอร์ + กระโดดตามทิศ -----
     if (PAD.fire || PAD.missile) padRelease();
-    padSetKey('KeyD', false); padSetKey('KeyA', false); padSetKey('KeyW', false); padSetKey('KeyQ', false);
+    padSetKey('KeyD', false); padSetKey('KeyA', false); padSetKey('KeyW', false); padSetKey('KeyQ', false); padSetKey('KeyS', false);
     if (lx || ly) {
       mouse.x = Math.max(0, Math.min(W, mouse.x + lx * PAD.CURSOR_SPEED * dt));
       mouse.y = Math.max(0, Math.min(H, mouse.y + ly * PAD.CURSOR_SPEED * dt));

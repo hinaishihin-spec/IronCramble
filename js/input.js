@@ -8,7 +8,7 @@ const keys = Object.create(null);
 const mouse = { x: 520, y: 225, down: false, rightDown: false };   // down = ปุ่มซ้าย (ยิงปืน), rightDown = ปุ่มขวา (ยิงมิสไซล์)
 
 const GAME_KEYS = new Set(['KeyA', 'KeyD', 'KeyW', 'KeyR', 'KeyN', 'KeyQ', 'KeyE', 'KeyF', 'Space', 'Enter',
-  'ShiftLeft', 'ShiftRight', 'ArrowLeft', 'ArrowRight', 'ArrowUp']);
+  'ShiftLeft', 'ShiftRight', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyS']);
 
 window.addEventListener('keydown', function (e) {
   if (e.ctrlKey || e.metaKey || e.altKey) return;     // ไม่แย่ง Ctrl+R (รีเฟรช) และคีย์ลัดของเบราว์เซอร์
