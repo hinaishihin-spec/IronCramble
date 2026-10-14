@@ -58,6 +58,8 @@ function spawnWave(wave) {
     else if (kind === 'chopper') e = makeChopper(baseX + off);
     else if (kind === 'bomber') e = makeBomber(baseX + off, y || BOMBER_Y);          // ตัวเลขที่ 3 = ความสูงบิน
     else if (kind === 'monolet') e = makeMonolet(baseX + off);
+    else if (kind === 'swanzer') e = makeShotWanzer(baseX + off);
+    else if (kind === 'mwanzer') e = makeMissileWanzer(baseX + off);
     else if (kind === 'tplane') e = makeTPlane(baseX + off, y || TPLANE_Y);          // ตัวเลขที่ 3 = ความสูงบิน
     else if (kind === 'launcher') e = makeLauncher(baseX + off, false);
     else if (kind === 'swarmer') e = makeLauncher(baseX + off, true);
@@ -66,6 +68,7 @@ function spawnWave(wave) {
     e.x = clamp(e.x, 0, WORLD_W - e.w - 10);
     e.homeX = e.x;
     e.hunt = true;                                  // เวฟที่เพิ่งโผล่จะมุ่งเข้าหาผู้เล่นทันที (ไม่เดินวนอยู่กับที่)
+    scaleEnemyHp(e, ENEMY_HP_MULT);
     enemies.push(e);
   }
 }
@@ -98,7 +101,7 @@ function updateBossTrigger() {
   mission.bossState = 'intro';
   mission.lockX = clamp(player.x + player.w / 2 - W * 0.4, 0, WORLD_W - W);   // จุดที่กล้องหยุดอยู่ตลอดการต่อสู้
   mission.bossWarn = BOSS_WARN_TIME;
-  enemies.push(makeBossFor(b, mission.lockX));          // ชนิดบอสตาม boss.kind ของด่าน (boss2.js)
+  enemies.push(scaleEnemyHp(makeBossFor(b, mission.lockX), BOSS_HP_MULT));          // ชนิดบอสตาม boss.kind ของด่าน (boss2.js)
   addShake(6);
 }
 

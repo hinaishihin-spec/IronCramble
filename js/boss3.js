@@ -70,7 +70,7 @@ function updateGiantBomber(e, dt, pcx, pcy) {
     if (e.cd <= 0 && onScreen) {
       const n = Math.min(GB_LAUNCH_N, GB_FIGHTER_CAP - bossMinions());
       if (n > 0) {
-        for (let i = 0; i < n; i++) enemies.push(makeFighter(cx + (i - (n - 1) / 2) * 30, e.y + e.h, pcx, pcy));
+        for (let i = 0; i < n; i++) enemies.push(scaleEnemyHp(makeFighter(cx + (i - (n - 1) / 2) * 30, e.y + e.h, pcx, pcy), ENEMY_HP_MULT));
         spawnSparks(cx, e.y + e.h, 8, '#8fe3b0');
         e.fireFlash = 0.1;
         e.cd = GB_LAUNCH_CD;

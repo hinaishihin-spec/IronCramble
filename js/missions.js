@@ -10,9 +10,11 @@
                ชนิด: 'walker' | 'drone' | 'tank' | 'chopper' | 'sniper'
                | 'bomber' (ตัวเลขที่ 3 = ความสูงบิน) | 'launcher' (รถมิสไซล์ลูกเดียว) | 'swarmer' (รถมิสไซล์ฝูง)
                | 'monolet' (หุ่นนกกระจอกเทศยิงเลเซอร์ กระโดดยิง) | 'tplane' (เครื่องบินล่องหนโฉบทิ้งระเบิด ตัวเลขที่ 3 = ความสูงบิน)
+               | 'swanzer' (Shotgun Wanzer หุ่น Hammer ถือลูกซอง) | 'mwanzer' (Missile Wanzer หุ่น Hammer ยิงมิสไซล์ครั้งละ 2 นัด)
                (sniper: ตัวเลขที่ 2 = เยื้องเข้าซ้ายจากขอบจอขวา เมื่อมีสไนเปอร์หลายตัวในเวฟเดียว)
-   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber' }
+   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber'|'mimic'|'carrier' }
                ด่านที่มีบอส: จบเมื่อกำจัดบอสได้ (เวฟทั้งหมดต้องอยู่ก่อนระยะ at)
+   scene       (ไม่บังคับ) ชื่อชุดภาพฉาก เช่น 'city' -> assets/bg/city_far.png ... ไม่ใส่ = m<เลขด่าน> แล้วถอยไปใช้ default (ดู scenery.js)
    ด่านจบเมื่อ: ทุกเวฟโผล่ครบแล้ว และกำจัดศัตรูหมดทุกตัว (หรือกำจัดบอสได้ ถ้าด่านมีบอส)
    ========================================================================== */
 
@@ -93,7 +95,7 @@ const MISSIONS = [
   {
     id: 6, title: 'GHOST LINE', name: 'MISSION 06  GHOST LINE',
     lengthM: 1600, unlockAt: 5, bonusExp: 500, bonusGold: 1000,
-    // ยังไม่มีบอส (จบเมื่อกำจัดศัตรูครบทุกเวฟ) จะเพิ่ม boss: { at: 1500, name: '...', kind: '...' } ทีหลังได้
+    boss: { at: 1540, name: 'MIMIC ATTACKER I', kind: 'mimic' },
     waves: [
       { at: 60,   units: [['monolet', 0], ['walker', 90]] },
       { at: 170,  units: [['monolet', 0], ['monolet', 140], ['drone', 100, 150]] },
@@ -109,10 +111,31 @@ const MISSIONS = [
       { at: 1360, units: [['tplane', 0, 85], ['tplane', 220, 108], ['monolet', 120], ['monolet', 240]] },
       { at: 1470, units: [['monolet', 0], ['monolet', 130], ['tplane', 60, 90], ['tank', 220]] }
     ]
+  },
+  {
+    id: 7, title: 'STEEL LEGION', name: 'MISSION 07  STEEL LEGION',
+    lengthM: 1700, unlockAt: 6, bonusExp: 600, bonusGold: 1200,
+    boss: { at: 1620, name: 'GIANT CARRIER', kind: 'carrier' },
+    waves: [
+      { at: 60,   units: [['swanzer', 0], ['walker', 90]] },
+      { at: 170,  units: [['mwanzer', 0], ['drone', 100, 150]] },
+      { at: 290,  units: [['swanzer', 0], ['swanzer', 130], ['launcher', 200]] },
+      { at: 400,  units: [['mwanzer', 0], ['monolet', 130], ['sniper', 0]] },
+      { at: 520,  units: [['swanzer', 0], ['mwanzer', 160], ['walker', 80]] },
+      { at: 640,  units: [['tplane', 0, 84], ['swanzer', 120], ['monolet', 240]] },
+      { at: 760,  units: [['mwanzer', 0], ['mwanzer', 150], ['tank', 230]] },
+      { at: 880,  units: [['swanzer', 0], ['swanzer', 120], ['swarmer', 200], ['drone', 60, 140]] },
+      { at: 1000, units: [['mwanzer', 0], ['swanzer', 140], ['chopper', 60]] },
+      { at: 1120, units: [['monolet', 0], ['swanzer', 120], ['mwanzer', 240], ['tplane', 60, 90]] },
+      { at: 1240, units: [['swanzer', 0], ['swanzer', 110], ['mwanzer', 220], ['sniper', 0]] },
+      { at: 1360, units: [['mwanzer', 0], ['mwanzer', 130], ['swanzer', 250], ['bomber', 60, 85]] },
+      { at: 1470, units: [['tplane', 0, 84], ['swanzer', 100], ['mwanzer', 230], ['tank', 330]] },
+      { at: 1540, units: [['swanzer', 0], ['swanzer', 120], ['mwanzer', 240], ['monolet', 360]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1620 m)
+    ]
   }
 ];
 
-const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', monolet: 'Monolet Bot', tplane: 'Tactical Plane', boss: 'BOSS' };
+const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', monolet: 'Monolet Bot', tplane: 'Tactical Plane', swanzer: 'Shotgun Wanzer', mwanzer: 'Missile Wanzer', boss: 'BOSS' };
 
 // ---------- การเลือกด่าน (ค่าอยู่ในหน่วยความจำ ไม่ได้เซฟ) ----------
 let selectedMission = -1;            // -1 = ยังไม่ได้เลือก -> Hangar จะเลือกด่านล่าสุดที่ปลดล็อกให้
@@ -136,7 +159,7 @@ function currentMission() { ensureValidSelection(); return MISSIONS[selectedMiss
 
 // นับศัตรูทั้งหมดของด่าน แยกตามชนิด เช่น { walker: 2, drone: 2, tank: 0, boss: 0, total: 4 } (บอสนับเป็น 1 ตัว)
 function missionTotals(m) {
-  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, monolet: 0, tplane: 0, boss: 0, total: 0 };
+  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, monolet: 0, tplane: 0, swanzer: 0, mwanzer: 0, boss: 0, total: 0 };
   for (const w of m.waves) for (const u of w.units) { t[u[0]]++; t.total++; }
   if (m.boss) { t.boss = 1; t.total++; }
   return t;
@@ -146,7 +169,7 @@ function missionTotals(m) {
 function missionSummaryText(m) {
   const t = missionTotals(m);
   const parts = [];
-  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer', 'monolet', 'tplane']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
+  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer', 'monolet', 'tplane', 'swanzer', 'mwanzer']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
   if (m.boss) parts.push(/^BOSS/.test(m.boss.name) ? m.boss.name : 'BOSS ' + m.boss.name);
   return parts.join(' / ');
 }

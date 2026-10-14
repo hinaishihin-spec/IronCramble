@@ -31,7 +31,7 @@ const player = freshPlayer();
 function resetPlayer() { Object.assign(player, freshPlayer()); }
 
 // ---------- สเตตัสที่ผูกกับเลเวล ----------
-function atkMult() { return Math.pow(LEVEL_ATK_BONUS, profile.level - 1) * partsDamageMult(); }   // เลเวล x โบนัสแขน
+function atkMult() { return (1 + LEVEL_ATK_STEP * (profile.level - 1)) * partsDamageMult(); }   // เลเวล x โบนัสแขน
 function mgDamage() { return Math.max(1, Math.round(MG_DMG * atkMult())); }
 
 function levelUpFx() {

@@ -7,8 +7,10 @@ let bullets = [];
 let missiles = [];
 let enemyShots = [];
 
+let beamCharge = null;    // กำลังชาร์จเลเซอร์ไหล่ { t } (null = ไม่ได้ชาร์จ)
+let beamShots = [];       // ลำแสงช็อตของเลเซอร์ไหล่ (Einshander) ที่ยังค้างจางอยู่
 let slashes = [];         // เอฟเฟกต์รอยฟันของอาวุธประชิด
-function resetWeapons() { bullets = []; missiles = []; enemyShots = []; beam = null; laserTick = 0; slashes = []; }
+function resetWeapons() { bullets = []; missiles = []; enemyShots = []; beam = null; laserTick = 0; slashes = []; beamShots = []; beamCharge = null; }
 
 // ยิงอาวุธช่อง slot (0 = ปืน คลิกซ้าย, 1 = มิสไซล์ คลิกขวา/F) ตามข้อมูลใน player.equippedWeapon / WEAPON_DATABASE
 // ดาเมจ = damage ของอาวุธ x atkMult() (เลเวล + แขน)  คูลดาวน์ = fireRate (มิลลิวินาที) หรือ MISSILE_DELAYS ตามประเภท
@@ -46,6 +48,10 @@ function fireWeapon(p, slot) {
       }
       addShake(7);
       spawnSparks(mx, my, 9, '#e8e2c8');
+    } else if (w.type === 'BEAM') {                  // เลเซอร์ไหล่: ชาร์จที่ไหล่ BEAM_CHARGE วินาที แล้วยิง (ดู releaseEinshander)
+      if (!beamCharge) beamCharge = { t: 0, dur: w.charge || BEAM_CHARGE };
+      addShake(1.5);
+      return beamCharge.dur + (w.cd || MISSILE_DELAYS.BEAM);
     } else {                                         // SINGLE: 1 ลูก นำวิถี
       missiles.push({ x: mx, y: my, ang: a, speed: MISSILE_SPEED * 0.7, life: MISSILE_LIFE, target: nearestEnemy(mx, my), dmg: dmg });
       addShake(5);
@@ -199,8 +205,82 @@ function updateLaser(dt) {
   }
 }
 
+
+// จุดเริ่มลำแสงของเลเซอร์ไหล่แต่ละเส้น (หลายเส้น = ขนานกัน ห่าง gap พิกเซล จัดกึ่งกลางที่ปากพอด) [{x,y}] พิกัดโลก
+function beamOrigins(p, w) {
+  const a = p.angle, pv = podPivotWorld(p), n = w.beams || 1, gap = w.gap || 0;
+  const mx = pv.x + Math.cos(a) * podMuzzleDist(), my = pv.y + Math.sin(a) * podMuzzleDist();
+  const out = [];
+  for (let i = 0; i < n; i++) { const t = i - (n - 1) / 2; out.push({ x: mx - Math.sin(a) * t * gap, y: my + Math.cos(a) * t * gap }); }
+  return out;
+}
+
+// ปล่อยเลเซอร์ไหล่: เส้นตรง (1 หรือ 2 เส้นขนานตามรุ่น) ทะลุศัตรูทุกตัว (ทะลวงเกราะ) โดนทันที ใช้ทิศเมาส์และตำแหน่งพอด ณ ตอนปล่อย
+// แต่ละเส้นทำดาเมจแยกกัน (ศัตรูตัวใหญ่ที่โดนทั้งสองเส้นเจ็บสองเท่า)
+function releaseEinshander(p) {
+  const w = equippedMissile();
+  if (w.type !== 'BEAM') return;
+  const a = p.angle, ca = Math.cos(a), sa = Math.sin(a);
+  const bdmg = Math.max(1, Math.round(w.damage * atkMult()));
+  for (const o of beamOrigins(p, w)) {
+    let len = BEAM_SHOT_LEN;
+    if (sa > 0.001 && (GROUND_Y - o.y) / sa < len) len = Math.max(0, (GROUND_Y - o.y) / sa);
+    const b = { x0: o.x, y0: o.y, ca: ca, sa: sa, len: len };
+    for (const e of enemies.slice()) {
+      if (untargetable(e)) continue;
+      const d = beamHitDist(b, e, len, ca, sa);
+      if (d >= 0) {
+        impact(o.x + ca * d, o.y + sa * d, -ca, -sa);
+        damageEnemy(e, bdmg, true);
+      }
+    }
+    beamShots.push({ x0: o.x, y0: o.y, x1: o.x + ca * len, y1: o.y + sa * len, t: 0, thin: (w.beams || 1) > 1 });
+    spawnSparks(o.x, o.y, 8, '#9fe8ff');
+  }
+  addShake(7 + 2 * ((w.beams || 1) - 1));
+  try { Sfx.play('beam_shot'); } catch (e) {}
+}
+
+// แสงชาร์จ + เส้นไกด์บางๆ ที่ปากพอดไหล่ระหว่างชาร์จ (หลายเส้น = ทุกกระบอกชาร์จพร้อมกัน)
+function drawBeamCharge() {
+  if (!beamCharge) return;
+  const p = player, w = equippedMissile(), k = clamp(beamCharge.t / beamCharge.dur, 0, 1), a = p.angle;
+  const ca = Math.cos(a), sa = Math.sin(a), tt = performance.now() / 1000;
+  ctx.save();
+  ctx.lineCap = 'round';
+  for (const o of beamOrigins(p, w)) {
+    const mx = o.x - cam, my = o.y;
+    let len = BEAM_SHOT_LEN;
+    if (sa > 0.001 && (GROUND_Y - my) / sa < len) len = Math.max(0, (GROUND_Y - my) / sa);
+    ctx.strokeStyle = 'rgba(120,220,255,' + (0.06 + 0.3 * k) + ')';                 // เส้นไกด์ทิศยิง จางๆ แล้วชัดขึ้น
+    ctx.lineWidth = 1 + k;
+    ctx.setLineDash([6, 8]);
+    ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx + ca * len, my + sa * len); ctx.stroke();
+    ctx.setLineDash([]);
+    const r = 3 + 15 * k + Math.random() * 2;                                        // ก้อนแสงที่ปากพอด
+    const g = ctx.createRadialGradient(mx, my, 0, mx, my, r * 1.8);
+    g.addColorStop(0, 'rgba(255,255,255,' + (0.7 + 0.3 * k) + ')');
+    g.addColorStop(0.35, 'rgba(140,230,255,' + (0.5 + 0.4 * k) + ')');
+    g.addColorStop(1, 'rgba(60,170,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(mx, my, r * 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(190,240,255,' + (0.8 * (1 - k) + 0.2) + ')';            // ประกายพุ่งเข้าหาปากพอด
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 6; i++) {
+      const ang = tt * 6 + i * Math.PI / 3, d0 = (26 - 20 * k) + (i % 2) * 6, d1 = d0 - 7;
+      ctx.beginPath(); ctx.moveTo(mx + Math.cos(ang) * d0, my + Math.sin(ang) * d0); ctx.lineTo(mx + Math.cos(ang) * d1, my + Math.sin(ang) * d1); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
 function updateWeapons(dt) {
+  if (beamCharge) {                                // ชาร์จเลเซอร์ไหล่: ตายหรือกางโล่ = ยกเลิก  ครบเวลา = ปล่อย
+    if (player.dead || player.shieldUp) beamCharge = null;
+    else { beamCharge.t += dt; if (beamCharge.t >= beamCharge.dur) { beamCharge = null; releaseEinshander(player); } }
+  }
   for (let i = slashes.length - 1; i >= 0; i--) { slashes[i].t += dt; if (slashes[i].t >= slashes[i].dur) slashes.splice(i, 1); }
+  for (let i = beamShots.length - 1; i >= 0; i--) { beamShots[i].t += dt; if (beamShots[i].t >= BEAM_SHOT_LIFE) beamShots.splice(i, 1); }
   updateLaser(dt);
   updateBullets(dt);
   updateMissiles(dt);
@@ -335,7 +415,25 @@ function updateEnemyShots(dt) {
   }
 }
 
+function drawBeamShots() {
+  drawBeamCharge();
+  ctx.lineCap = 'round';
+  for (const s of beamShots) {
+    const k = 1 - s.t / BEAM_SHOT_LIFE, x0 = s.x0 - cam, x1 = s.x1 - cam;
+    ctx.strokeStyle = 'rgba(80,200,255,' + 0.3 * k + ')';
+    ctx.lineWidth = (3 + 18 * k) * (s.thin ? 0.7 : 1);
+    ctx.beginPath(); ctx.moveTo(x0, s.y0); ctx.lineTo(x1, s.y1); ctx.stroke();
+    ctx.strokeStyle = 'rgba(160,235,255,' + 0.9 * k + ')';
+    ctx.lineWidth = (1 + 7 * k) * (s.thin ? 0.7 : 1);
+    ctx.beginPath(); ctx.moveTo(x0, s.y0); ctx.lineTo(x1, s.y1); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,' + k + ')';
+    ctx.lineWidth = 1 + 2.5 * k;
+    ctx.beginPath(); ctx.moveTo(x0, s.y0); ctx.lineTo(x1, s.y1); ctx.stroke();
+  }
+}
+
 function drawBeam() {
+  drawBeamShots();
   if (!beam) return;
   const pulse = 0.85 + 0.15 * Math.sin(performance.now() / 35);
   const k = beam.length > 1 ? 0.7 : 1;             // หลายเส้น = เส้นบางลงไม่ให้ทึบจอ

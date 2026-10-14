@@ -121,6 +121,8 @@ const Sfx = (function () {
     levelup:      function (t, d, r) { [523, 659, 784, 1047].forEach(function (f, i) { osc('triangle', f, f, t + i * 0.09, 0.22, 0.28, d); }); },
     enemy_shot:   function (t, d, r) { osc('square', 420 * r, 200, t, 0.07, 0.12, d); nz('bandpass', 2200, 1000, t, 0.05, 0.12, d); },
     tank_shell:   function (t, d, r) { osc('sawtooth', 100, 38, t, 0.38, 0.6, d); nz('lowpass', 900, 150, t, 0.32, 0.7, d); },
+    beam_charge:  function (t, d, r) { osc('sawtooth', 220 * r, 1400, t, 0.35, 0.12, d); osc('sine', 440 * r, 2200, t, 0.35, 0.1, d); },
+    beam_shot:    function (t, d, r) { osc('sawtooth', 2200 * r, 140, t, 0.32, 0.2, d); osc('square', 900 * r, 70, t, 0.28, 0.16, d); nz('bandpass', 1800, 900, t, 0.25, 0.25, d, 1); },
     enemy_laser:  function (t, d, r) { osc('sawtooth', 1700 * r, 520, t, 0.09, 0.15, d); osc('square', 2400 * r, 900, t, 0.06, 0.07, d); },
     snipe_shot:   function (t, d, r) { nz('bandpass', 3800, 300, t, 0.3, 0.9, d, 0.8); osc('sawtooth', 520, 45, t, 0.25, 0.6, d); },
     bomb_drop:    function (t, d, r) { osc('sine', 950, 280, t, 0.55, 0.14, d); },
@@ -248,7 +250,7 @@ const Sfx = (function () {
   fireWeapon = function (p, slot) {
     const r = _fire(p, slot);
     try {
-      if (slot === 1) { const m = equippedMissile(); Sfx.play(m.type === 'SWARM' ? 'missile_swarm' : 'missile', { vol: m.type === 'SWARM' ? 0.9 : 1, rate: m.type === 'DUAL' ? 1.08 : 1 }); }
+      if (slot === 1) { const m = equippedMissile(); if (m.type === 'BEAM') Sfx.play('beam_charge'); else Sfx.play(m.type === 'SWARM' ? 'missile_swarm' : 'missile', { vol: m.type === 'SWARM' ? 0.9 : 1, rate: m.type === 'DUAL' ? 1.08 : 1 }); }
       else {
         const g = equippedGun(), id = g.id;
         if (g.type === 'MELEE') Sfx.play(g.thrust ? 'punch' : 'melee_swing', { rate: g.thrust ? 1 : 0.9 });

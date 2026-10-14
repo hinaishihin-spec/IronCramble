@@ -13,6 +13,8 @@ function makeBossFor(def, lockX) {
   if (def.kind === 'hopper') return makeHopper(startX, lockX);
   if (def.kind === 'sniper') return makeBossSniper(startX, lockX);
   if (def.kind === 'bomber') return makeGiantBomber(startX, lockX);       // boss3.js
+  if (def.kind === 'mimic') return makeMimic(startX, lockX);              // boss4.js
+  if (def.kind === 'carrier') return makeCarrier(startX, lockX);          // boss5.js
   return makeBoss(startX, lockX + W - BOSS_W - 24, lockX + W * 0.52);
 }
 
@@ -20,13 +22,21 @@ function updateBoss(e, dt, pcx, pcy) {
   if (e.kind === 'hopper') updateHopper(e, dt, pcx, pcy);
   else if (e.kind === 'sniper') updateBossSniper(e, dt, pcx, pcy);
   else if (e.kind === 'bomber') updateGiantBomber(e, dt, pcx, pcy);
+  else if (e.kind === 'mimic') updateMimic(e, dt, pcx, pcy);
+  else if (e.kind === 'carrier') updateCarrier(e, dt, pcx, pcy);
   else updateFortress(e, dt, pcx, pcy);
 }
 
 function drawBoss(e, sx, sy, flash) {
+  if (drawEnemyArt(e, e.kind === 'carrier' && e.lift ? sx + (Math.random() - 0.5) * 3 * e.lift : sx, sy, flash)) {    // ภาพวาด assets/enemies/boss_<kind>.png (enemyart.js)
+    if (e.kind === 'carrier') drawCarrierBeams(e);
+    return;
+  }
   if (e.kind === 'hopper') drawHopper(e, sx, sy, flash);
   else if (e.kind === 'sniper') drawBossSniper(e, sx, sy, flash);
   else if (e.kind === 'bomber') drawGiantBomber(e, sx, sy, flash);
+  else if (e.kind === 'mimic') drawMimic(e, sx, sy, flash);
+  else if (e.kind === 'carrier') drawCarrier(e, sx, sy, flash);
   else drawFortress(e, sx, sy, flash);
 }
 

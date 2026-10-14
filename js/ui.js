@@ -482,17 +482,18 @@ function drawWeaponRow(c, hot) {
   const canAct = st === 'buy' || st === 'owned';
   ctx.fillStyle = st === 'equipped' ? '#1f2a1d' : (hot ? '#222a31' : '#1a2026');
   ctx.fillRect(c.x, c.y, c.w, c.h);
-  ctx.strokeStyle = st === 'equipped' ? '#5fd36f' : (hot ? (canAct ? '#e0a526' : '#59636d') : '#333c45');
+  ctx.strokeStyle = st === 'equipped' ? '#5fd36f' : (hot ? (canAct ? '#e0a526' : '#59636d') : (st === 'locked' ? '#3a2a2a' : '#333c45'));
   ctx.lineWidth = 2;
   ctx.strokeRect(c.x + 1, c.y + 1, c.w - 2, c.h - 2);
   const ty = c.y + c.h / 2 + 4;
   if (c.key) drawText('[' + c.key + ']', c.x + 8, ty, fnt(600, 10), '#6f7a70');
-  drawText(w.name, c.x + 32, ty, fnt(700, 12), st === 'poor' ? '#a8873a' : '#e0a526');
+  drawText(w.name, c.x + 32, ty, fnt(700, 12), st === 'locked' ? '#8a6a5f' : (st === 'poor' ? '#a8873a' : '#e0a526'));
   drawText(weaponTypeText(w), c.x + 138, ty, fnt(600, 10), w.id.indexOf('borz') === 0 ? '#ffd23f' : '#8d978c');
-  drawText(weaponStatsText(w), c.x + 190, ty, fnt(400, 10), '#b3bbb0');
+  drawText(st === 'locked' ? weaponStatsText(w).replace(/\s+(นน\.|น้ำหนัก).*$/, '') : weaponStatsText(w), c.x + 190, ty, fnt(400, 10), st === 'locked' ? '#7d857c' : '#b3bbb0');   // แถวล็อก: ตัดน้ำหนักออก เหลือที่ให้ป้าย LOCKED
   const rx = c.x + c.w - 10;
   if (st === 'equipped') drawText('EQUIPPED', rx, ty, fnt(700, 11), '#5fd36f', 'right');
   else if (st === 'owned') drawText('OWNED · สวม', rx, ty, fnt(700, 11), '#d9dfd2', 'right');
+  else if (st === 'locked') { const lk = weaponLock(w.id); drawText('LOCKED  ด่าน ' + lk.mission + ' (' + lk.have + '/' + lk.need + ')', rx, ty, fnt(700, 10), '#e0583a', 'right'); }
   else drawText(w.price + ' CR', rx, ty, fnt(700, 12), st === 'buy' ? '#ffd23f' : '#7d6d33', 'right');
 }
 

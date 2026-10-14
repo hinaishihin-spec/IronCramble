@@ -8,7 +8,7 @@
 
 let enemies = [];
 
-const ENEMY_EXP = { walker: 30, drone: 20, tank: 60, chopper: 55, sniper: 45, bomber: 70, launcher: 60, swarmer: 55, monolet: 75, tplane: 90 };
+const ENEMY_EXP = { walker: 30, drone: 20, tank: 60, chopper: 55, sniper: 45, bomber: 70, launcher: 60, swarmer: 55, monolet: 75, tplane: 90, swanzer: 70, mwanzer: 75 };
 
 function resetEnemies() { enemies = []; }
 
@@ -38,7 +38,7 @@ function nearestEnemy(x, y) {
 // ---------- รับดาเมจ / ตาย ----------
 // คืนค่า true ถ้าศัตรูตายจากการโจมตีนี้
 function damageEnemy(e, dmg, heavy, ignoreArmor) {
-  if (e.type === 'boss' && e.mode === 'intro') return false;      // บอสกำลังเลื่อนเข้าจอ: ยังโดนไม่ได้
+  if (e.type === 'boss' && (e.mode === 'intro' || e.mode === 'split')) return false;      // บอสกำลังเลื่อนเข้าจอ: ยังโดนไม่ได้
   // 1) สุ่มดาเมจพื้นฐาน +/- DMG_VARIANCE  2) สุ่มคริติคอล CRIT_CHANCE (x CRIT_MULT และทะลวงเกราะ)
   dmg = Math.max(1, Math.round(dmg * (1 + (Math.random() * 2 - 1) * DMG_VARIANCE)));
   const crit = Math.random() < CRIT_CHANCE;
@@ -90,6 +90,7 @@ function updateEnemies(dt) {
     if (e.type === 'bomber') { updateBomber(e, dt, pcx, pcy); continue; }       // enemy3.js
     if (e.type === 'monolet') { updateMonolet(e, dt, pcx, pcy); continue; }     // enemy4.js
     if (e.type === 'tplane') { updateTPlane(e, dt, pcx, pcy); continue; }       // enemy4.js
+    if (e.type === 'swanzer' || e.type === 'mwanzer') { updateWanzerE(e, dt, pcx, pcy); continue; }   // enemy5.js
     if (e.type === 'fighter') { updateFighter(e, dt, pcx, pcy); continue; }     // boss3.js (ลูกน้อง Giant Bomber)
     if (e.type === 'launcher' || e.type === 'swarmer') { updateLauncher(e, dt, pcx, pcy); continue; }   // enemy3.js
 
@@ -239,7 +240,9 @@ function drawEnemies() {
     const flash = e.flash > 0;
     let barY;
 
-    if (e.type === 'walker') {
+    if (e.type !== 'boss' && drawEnemyArt(e, sx, sy, flash)) {          // มีภาพวาดใน assets/enemies/ (enemyart.js)
+      barY = sy - (ENEMY_ART[e.type] && ENEMY_ART[e.type].bar || ENEMY_BAR[e.type] || 14);
+    } else if (e.type === 'walker') {
       const step = Math.sin(e.phase * 8) * 3;
       ctx.fillStyle = '#3a2420';
       ctx.fillRect(sx + 6, sy + e.h - 12 - Math.max(0, step), 9, 12);
@@ -272,6 +275,9 @@ function drawEnemies() {
     } else if (e.type === 'tplane') {
       drawTPlane(e, sx, sy, flash);
       barY = sy - 18;
+    } else if (e.type === 'swanzer' || e.type === 'mwanzer') {
+      drawWanzerE(e, sx, sy, flash);
+      barY = sy - 16;
     } else if (e.type === 'fighter') {
       drawFighter(e, sx, sy, flash);
       barY = sy - 12;

@@ -69,7 +69,7 @@ function bossLaunchDrones(e) {
     d.hunt = true;
     d.minion = true;                                         // ลูกน้องบอส: ไม่นับในจำนวนศัตรูของด่าน ไม่ให้ EXP
     d.homeX = d.x;
-    enemies.push(d);
+    enemies.push(scaleEnemyHp(d, ENEMY_HP_MULT));
     spawnSparks(d.x + 17, d.y, 6, '#8fe3b0');
   }
 }
@@ -120,7 +120,7 @@ function updateFortress(e, dt, pcx, pcy) {
   }
 
   // เปลี่ยนเฟส: HP ต่ำกว่า 250 -> คำราม (เรืองแสงแดง) แล้วเริ่มท่าของเฟส 2
-  if (e.stage === 1 && e.hp <= BOSS_PHASE2_HP) {
+  if (e.stage === 1 && e.hp <= (e.phase2Hp !== undefined ? e.phase2Hp : BOSS_PHASE2_HP)) {
     e.stage = 2;
     e.mode = 'roar'; e.modeT = 0; e.modeDur = 1.4; e.step = -1; e.charge = 0;
     addShake(9);
@@ -389,7 +389,7 @@ function drawBossHud() {
   }
 
   // หลอด HP บอส
-  const b = m.boss && m.bossState === 'dying' ? m.boss : enemies.find(function (o) { return o.type === 'boss'; });
+  const b = m.boss && m.bossState === 'dying' ? m.boss : ((typeof carrierHudBoss === 'function' && carrierHudBoss()) || enemies.find(function (o) { return o.type === 'boss'; }));
   if (b && (fighting || m.bossState === 'dying')) {
     const bx = 220, by = 63, bw = 360, bh = 12;
     const r = clamp(b.hp / b.maxHp, 0, 1);

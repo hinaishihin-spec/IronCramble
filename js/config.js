@@ -52,7 +52,7 @@ const CRIT_MULT = 2;               // คริติคอล = ดาเมจ
 // Progression
 const ITEM_SIZE = 14;
 const DROP_CHANCE = 0.75;
-const LEVEL_ATK_BONUS = 1.1;   // พลังโจมตี x1.1 ต่อเลเวล
+const LEVEL_ATK_STEP = 0.03;   // พลังโจมตี +3% ของฐานต่อเลเวล (แบบบวก ไม่ทบต้น: เลเวล 48 = x2.41)  ของเดิมคือทบต้น x1.1 ต่อเลเวล ซึ่งที่เลเวล 48 ได้ x88
 
 // Hangar / Upgrades (ราคา = BASE + STEP * เลเวลปัจจุบัน)
 const ARMOR_MAX_LV = 5;
@@ -278,3 +278,65 @@ const TPLANE_ACCEL = 420;
 const TPLANE_OVERSHOOT = 380;
 const TPLANE_BOMB_CD = 0.22;
 const TPLANE_REVEAL = 1.5;         // วินาทีที่เห็นตัวเต็มและโดนปืนได้หลังเปิดช่องระเบิด (นอกนั้นล่องหน: โดนได้แค่มิสไซล์ล็อกเป้า)
+
+// ---------- บอสด่าน 06: MIMIC ATTACKER I (boss4.js) ----------
+const MIM_K = 1.5;                                   // ขนาดหุ่นเทียบผู้เล่น (1.5 เท่า)
+const MIM_W = PLAYER_BOX.w * MIM_K, MIM_H = PLAYER_BOX.h * MIM_K;
+const MIM_HP = 680, MIM_PHASE2_HP = 340, MIM_ARMOR = 0.2;
+const MIM_EXP = 550, MIM_REWARD_GOLD = 500;
+const MIM_SNIPE_DMG = 24;                            // กระสุนสไนเปอร์ต่อนัด (เฟส 2 ยิงเบิ้ล = 2 นัด)
+const MIM_SIGHT_TIME = 1.4, MIM_LOCK_AT = 1.0;       // เลเซอร์ไซต์ ล็อกเส้นที่ 1.0 วินาที ยิงที่ 1.4 วินาที
+const MIM_DOUBLE_GAP = 0.28;                         // เฟส 2: นัดที่สองตามนัดแรกหลังกี่วินาที (ยิงเส้นเดิม)
+const MIM_REST = 1.3, MIM_REST2 = 0.9;               // พักระหว่างท่า (เฟส 1 / เฟส 2)
+const MIM_MISSILE_DMG = 20, MIM_MISSILE_SPEED = 290, MIM_MISSILE_SHIELD_COST = 14;   // มิซไซล์เดี่ยว (เฟส 1)
+const MIM_SWARM_CD = 5.0;                            // เฟส 2: สแปมฝูงมิซไซล์ทุกกี่วินาที
+const MIM_SWARM_N = 9, MIM_SWARM_GAP = 0.1;          // จำนวนลูก / ช่วงห่างระหว่างลูก
+const MIM_SWARM_DMG = 8, MIM_SWARM_SPEED = 250, MIM_SWARM_SHIELD_COST = 6;
+const MIM_SPEED = 115, MIM_SPEED2 = 150;             // ความเร็วเดิน (เฟส 1 / เฟส 2)
+const MIM_DASH_SPEED = 640, MIM_DASH_TIME = 0.17;    // แดช
+const MIM_HOP_VY = 640;                              // กระโดดสั้นๆ
+
+// ศัตรูด่าน 07 (enemy5.js): Shotgun Wanzer / Missile Wanzer — หุ่น Wanzer ใช้ภาพพาร์ท Hammer เดินถอย/กระโดด/แดชแบบ Mimic Attacker
+const WZ_K = 1.1;                                    // ขนาดเทียบผู้เล่น
+const WZ_W = Math.round(PLAYER_BOX.w * WZ_K), WZ_H = Math.round(PLAYER_BOX.h * WZ_K);
+const WZ_DASH_SPEED = 600, WZ_DASH_TIME = 0.15;
+const WZ_HOP_VY = 600;
+const WZ_AIM_TURN = 5.0;                             // rad/s ความเร็วหมุนปืนตามผู้เล่น
+// Shotgun Wanzer: เข้าใกล้ ชาร์จแล้วยิงลูกซองกระจายระยะสั้น
+const SW_HP = 150, SW_ARMOR = 0.15, SW_SPEED = 95;
+const SW_PREF_MIN = 140, SW_PREF_MAX = 270;          // ใกล้กว่านี้ถอย ไกลกว่านี้เดินเข้าหา
+const SW_RANGE = 310;                                // ยิงเมื่ออยู่ในระยะนี้
+const SW_WINDUP = 0.55, SW_FIRE_CD = 2.4;
+const SW_PELLETS = 6, SW_SPREAD = 0.36;              // จำนวนเม็ด / มุมกระจายรวม (เรเดียน)
+const SW_DMG = 6, SW_PELLET_SPEED = 560, SW_PELLET_LIFE = 0.42, SW_SHIELD = 3;
+// Missile Wanzer: เว้นระยะ ยิงมิสไซล์ครั้งละ 2 นัด
+const MW_HP = 140, MW_ARMOR = 0.1, MW_SPEED = 85;
+const MW_PREF_MIN = 300, MW_PREF_MAX = 480;
+const MW_RANGE = 580;
+const MW_WINDUP = 0.6, MW_FIRE_CD = 3.4;
+const MW_MISSILES = 2, MW_GAP = 0.22;                // มิสไซล์ต่อครั้ง / ห่างกัน (วินาที)
+const MW_DMG = 15, MW_MISSILE_SPEED = 265, MW_SHIELD = 12;
+
+// ---------- บอสด่าน 07: GIANT CARRIER (boss5.js) ----------
+// เฟส 1 รถถังบรรทุกเครื่องบิน: เลเซอร์ 2 เส้นสลับมิสไซล์ถล่ม / เฟส 2 แยกเป็น Mobile Fortress + Giant Bomber (ใช้ท่าเฟสแรกของตัวเอง)
+const CARRIER_W = 230, CARRIER_H = 134;
+const CARRIER_HP = 1000, CARRIER_PHASE2_HP = 500, CARRIER_ARMOR = 0.25;
+const CARRIER_FORT_HP = 220, CARRIER_BOMBER_HP = 280;    // เฟส 2: HP ของแต่ละชิ้นรวมกัน = CARRIER_PHASE2_HP (หลอดบนจอไหลต่อเนื่อง)
+const CARRIER_EXP = 800, CARRIER_PART_EXP = 150, CARRIER_REWARD_GOLD = 700;    // EXP รวมได้ตอนชิ้นสุดท้ายพัง / ชิ้นแรกพังได้ PART_EXP
+const CARRIER_REST = 1.3;                                 // พักระหว่างท่า (วินาที)
+const CARRIER_SIGHT_TIME = 1.3, CARRIER_LOCK_AT = 0.9;    // เลเซอร์: เล็งตาม 0.9 วิ ล็อกเส้น ยิงที่ 1.3 วิ
+const CARRIER_BEAM_TIME = 0.4, CARRIER_BEAM_TICK = 0.18;  // ลำแสงค้างกี่วินาที / ดาเมจทุกกี่วินาที
+const CARRIER_BEAM_DMG = 12, CARRIER_BEAM_SHIELD = 10, CARRIER_BEAM_HALF = 10;   // ดาเมจต่อติ๊ก / กินโล่ / ครึ่งความหนาของลำแสง (px)
+const CARRIER_BARRAGE_N = 12, CARRIER_BARRAGE_GAP = 0.1, CARRIER_BARRAGE_CHARGE = 0.7;
+const CARRIER_MISSILE_DMG = 8, CARRIER_MISSILE_SPEED = 250, CARRIER_MISSILE_SHIELD = 6;
+const CARRIER_SPLIT_TIME = 1.4;                           // วินาทีที่แยกร่าง (ยังโดนไม่ได้)
+
+// ---------- ปรับความยาก: ตัวคูณเลือดศัตรู (ใช้ตอนศัตรูโผล่) ----------
+// 2 = เพิ่ม 100%, 4 = เพิ่ม 300%  / ใส่ 1 = เลือดเดิม
+const ENEMY_HP_MULT = 2;     // ศัตรูทั่วไป (รวมลูกสมุน/เครื่องบินที่บอสปล่อย)
+const BOSS_HP_MULT = 4;      // ศัตรูประเภทบอส
+function scaleEnemyHp(e, m) {
+  e.hp = Math.round(e.hp * m); e.maxHp = Math.round(e.maxHp * m);
+  if (e.phase2Hp) e.phase2Hp = Math.round(e.phase2Hp * m);
+  return e;
+}
