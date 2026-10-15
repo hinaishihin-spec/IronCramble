@@ -91,7 +91,7 @@ function droneTarget(x, y, range, strongest) {
   return best;
 }
 
-function droneDmg(base, e) { return base * atkMult() * (e.type === 'boss' ? DRONE_BOSS_MULT : 1); }
+function droneDmg(base, e) { return base * atkMult(equippedDrone()) * (e.type === 'boss' ? DRONE_BOSS_MULT : 1); }
 
 function droneLine(x0, y0, x1, y1, col, w, dur) { droneFx.push({ x0: x0, y0: y0, x1: x1, y1: y1, t: 0, dur: dur, col: col, w: w }); }
 

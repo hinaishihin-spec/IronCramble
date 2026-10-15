@@ -78,7 +78,7 @@ function drawHUD() {
   ctx.fillStyle = '#e0a526';
   ctx.fillText('WANZER  UNIT-01', 20, 28);
   ctx.fillStyle = '#d9dfd2';
-  ctx.fillText('DIST ' + Math.floor(player.x / 10) + ' m   ATK x' + atkMult().toFixed(2), 20, 46);
+  ctx.fillText('DIST ' + Math.floor(player.x / 10) + ' m   ATK x' + atkMult(equippedGun()).toFixed(2), 20, 46);
   ctx.fillText('SHOTS ' + run.shots + '   FPS ' + Fps.shown, 20, 62);
 
   // level progress bar
@@ -593,6 +593,8 @@ function drawHangarScreen(h) {
   // อาวุธที่ติดตั้ง 2 ช่อง
   drawText('1 ปืน: ' + equippedGun().name + '   2 มิสไซล์: ' + equippedMissile().name, mx + 14, my + mh - 21, fnt(600, 10), '#d9dfd2');
   drawText('น้ำหนักอาวุธ ' + weaponsWeight(), mx + 14, my + mh - 8, fnt(400, 10), '#8d978c');
+  const pbt = partsBonusText();
+  if (pbt) drawText(pbt, mx + mw - 14, my + mh - 8, fnt(600, 10), '#e0a526', 'right');          // โบนัสพิเศษจากพาร์ท (ตามชนิดอาวุธ / ลดดาเมจ)
 
   // การ์ดอัปเกรด + ปุ่ม
   for (let i = 0; i < h.items.length; i++) {

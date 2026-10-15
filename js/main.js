@@ -11,7 +11,7 @@ let lastTime = performance.now();
 
 // สิ่งที่ต้องมี: [ไฟล์, ชื่อที่ไฟล์นั้นประกาศไว้]  ขาดอันไหน = ไฟล์นั้นไม่ได้โหลด (ไม่อยู่ใน index.html / ไม่ได้อัปโหลด / เป็นรุ่นเก่า)
 const REQUIRED_SYMBOLS = [
-  ['config.js', 'TPLANE_REVEAL'], ['config.js', 'MONO_W'], ['parts.js', 'WANZER_PARTS'], ['partext.js', 'partLock'], ['series_zeus.js', 'WANZER_PARTS'],
+  ['config.js', 'TPLANE_REVEAL'], ['config.js', 'MONO_W'], ['parts.js', 'WANZER_PARTS'], ['partext.js', 'partLock'], ['series_zeus.js', 'WANZER_PARTS'], ['series_special.js', 'WANZER_PARTS'],
   ['crouch.js', 'updateCrouch'], ['weapondb.js', 'WEAPON_DATABASE'], ['save.js', 'Save'], ['input.js', 'keys'],
   ['player.js', 'updatePlayer'], ['enemy.js', 'updateEnemies'], ['enemy2.js', 'updateSniper'], ['enemy3.js', 'updateBomber'],
   ['enemy4.js', 'makeMonolet'], ['enemy5.js', 'makeShotWanzer'], ['enemy4.js', 'untargetable'], ['boss3.js', 'makeGiantBomber'], ['boss4.js', 'makeMimic'], ['boss5.js', 'makeCarrier'], ['boss6.js', 'makeMegaBolt'], ['drone.js', 'updateDrones'], ['enemy6.js', 'makeShieldWanzer'], ['enemy7.js', 'makeMortar'], ['boss7.js', 'makeAce'], ['enemy8.js', 'makeWelder'], ['boss8.js', 'makeAssemblyArm'], ['enemyart.js', 'drawEnemyArt'], ['scenery.js', 'sceneImage'],

@@ -270,3 +270,8 @@
 - Mine Layer (`minelayer`): เดินวนห่างผู้เล่น วางทุ่นระเบิดลงพื้นเรื่อยๆ ทุ่นระเบิดเมื่อเดินทับ กระโดดข้ามได้ และยิงโดนที่ระดับพื้นจะระเบิดทิ้งโดยไม่ทำดาเมจ
 - บอส ASSEMBLY ARM (`assembly`): ทุบพื้นเกิดคลื่นกระแทกซ้าย-ขวา (กระโดดข้าม) / ประกายเชื่อมพัดกระสุน / สายพานประกอบหุ่นลูกน้อง (เฟส 1 Walker, เฟส 2 Shotgun Wanzer / Welder Bot) เฟส 2 ทุบสองครั้งติดและพักสั้นลง
 - ค่าตัวเลขอยู่บนสุดของ enemy8.js (WLD_*, MLY_*, MINE_*) และ boss8.js (AS_*)  ภาพ: assets/enemies/welder.png minelayer.png boss_assembly.png
+
+## พาร์ทซีรีส์พิเศษ (js/series_special.js) + โบนัสตามชนิดอาวุธ / ลดดาเมจ (js/partext.js)
+- ซีรีส์ PrirateK (Shotgun) / SpaceR (Rifle + โดรน Sniper) / MagiL (มิสไซล์ + ลดดาเมจ) / BeastE (ประชิด + เร็ว) ราคาเท่ากันทุกชิ้น (SPECIAL_PRICE) และ MegaZ ใน parts.js ถูกย้ายเข้ากลุ่ม SPECIAL ใน Hangar
+- ฟิลด์ใหม่ในข้อมูลพาร์ททุกหมวด: `typeBonus: { SHOTGUN|RIFLE|MISSILE|MELEE: 0.20 }` (ทุกชิ้นที่สวมบวกกัน มีผลเมื่อถืออาวุธชนิดนั้น) และ `defense: 0.06` (ลดดาเมจที่ได้รับ รวมไม่เกิน DEFENSE_CAP = 20%)
+- `atkMult(w)` รับอาวุธเป็นพารามิเตอร์ (ไม่ใส่ = ไม่นับโบนัสชนิดอาวุธ)  Hangar แสดงโบนัสรวมที่มุมขวาล่างของกรอบหุ่น

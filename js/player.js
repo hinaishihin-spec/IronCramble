@@ -31,7 +31,8 @@ const player = freshPlayer();
 function resetPlayer() { Object.assign(player, freshPlayer()); }
 
 // ---------- สเตตัสที่ผูกกับเลเวล ----------
-function atkMult() { return (1 + LEVEL_ATK_STEP * (profile.level - 1)) * partsDamageMult(); }   // เลเวล x โบนัสแขน
+// w = อาวุธที่ยิง (ไม่ใส่ = ไม่นับโบนัสตามชนิดอาวุธ)  โบนัสตามชนิดอาวุธมาจากพาร์ท typeBonus (partext.js)
+function atkMult(w) { return (1 + LEVEL_ATK_STEP * (profile.level - 1)) * partsDamageMult() * (1 + (w ? partsTypeBonus(weaponBonusKey(w)) : 0)); }   // เลเวล x โบนัสแขน x โบนัสตามชนิดอาวุธ
 function mgDamage() { return Math.max(1, Math.round(MG_DMG * atkMult())); }
 
 function levelUpFx() {
@@ -64,6 +65,7 @@ function gainExp(n, silent) {
 // shieldCost = เกจโล่ที่เสียเมื่อรับกระสุนนี้ขณะกางโล่ (ไม่ใส่ = ค่าปกติ ส่วนกระสุนปืนใหญ่จะส่งค่ามากกว่า)
 function damagePlayer(dmg, shieldCost) {
   if (player.dead) return;
+  dmg *= (1 - partsDefense());                     // ค่าลดดาเมจจากพาร์ท (partext.js)
   if (player.shieldUp) {
     dmg *= (1 - SHIELD_REDUCE);
     player.shield = Math.max(0, player.shield - (shieldCost === undefined ? SHIELD_HIT_COST : shieldCost));

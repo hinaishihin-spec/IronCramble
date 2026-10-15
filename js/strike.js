@@ -16,9 +16,9 @@ function resetStrikes() { strikes = []; firePatches = []; fireTick = 0; }
 // กดยิง: ล็อกจุดเป้า (x ของเมาส์ในโลก) แล้วเริ่มนับเวลาหน่วง  คืนคูลดาวน์ (วินาที)
 function startStrike(p, w) {
   const tx = clamp(mouse.x + cam, Math.max(0, cam + 24), Math.min(WORLD_W, cam + W - 24));
-  const s = { kind: w.type, w: w, x: tx, t: 0, delay: w.delay || 1.3, ticks: 0, dmg: Math.max(1, Math.round(w.damage * atkMult())) };
+  const s = { kind: w.type, w: w, x: tx, t: 0, delay: w.delay || 1.3, ticks: 0, dmg: Math.max(1, Math.round(w.damage * atkMult(w))) };
   if (w.type === 'NAPALM') {
-    s.burn = Math.max(1, Math.round((w.burn || 12) * atkMult()));
+    s.burn = Math.max(1, Math.round((w.burn || 12) * atkMult(w)));
     s.bombs = [-1, 0, 1].map(function (k, i) { return { x: tx + k * NAPALM_SPREAD, land: s.delay + i * NAPALM_BOMB_GAP, hit: false }; });
   }
   strikes.push(s);

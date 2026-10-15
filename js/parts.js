@@ -31,9 +31,9 @@ const WANZER_PARTS = {
   ],
   LEGS: [
     { id: "basic", name: "Basic Block", price: 0, speedBonus: 1.0, boostBonus: 1.0, weight: 0,  maxLoad: 0 },
-    { id: "zeriot_1", name: "Zeriot I", price: 150, speedBonus: 1.1, boostBonus: 1.1, weight: 10,  maxLoad: 8 },
-    { id: "hammer_1", name: "Hammer I", price: 200, speedBonus: 0.9, boostBonus: 0.8, weight: 25,  maxLoad: 30, spriteUrl: "assets/parts/legs_hammer.png" },
-	{ id: "megaz", name: "MegaZ", price: 1000, speedBonus: 1.4, boostBonus: 1.3, weight: 50,  maxLoad: 60, spriteUrl: "assets/parts/legs_megaz.png" }
+    { id: "zeriot_1", name: "Zeriot I", price: 150, speedBonus: 1.1, boostBonus: 1.1, weight: 5,  maxLoad: 8 },
+    { id: "hammer_1", name: "Hammer I", price: 200, speedBonus: 0.9, boostBonus: 0.8, weight: 13,  maxLoad: 30, spriteUrl: "assets/parts/legs_hammer.png" },
+	{ id: "megaz", name: "MegaZ", price: 1000, speedBonus: 1.4, boostBonus: 1.3, weight: 25,  maxLoad: 60, spriteUrl: "assets/parts/legs_megaz.png" }
   ],
   SHOULDERS: [
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 10, weight: 0, spriteUrl: "assets/parts/basic_shoulder.png" },
@@ -43,10 +43,10 @@ const WANZER_PARTS = {
   ],
   BACKPACK: [
     { id: "basic", name: "Basic Block", price: 0, boostDuration: 3.0, weight: 0, maxLoad: 0 },
-    { id: "vernier_1", name: "Vernier I", price: 200, boostDuration: 4.0, weight: 8, maxLoad: 15 },
-    { id: "turbo_1", name: "Turbo I", price: 350, boostDuration: 5.5, weight: 15, maxLoad: 25 },
-	{ id: "hammer_1", name: "Hammer", price: 400, boostDuration: 6.5, weight: 23, maxLoad: 30, spriteUrl: "assets/parts/backpack_hammer.png" },
-	{ id: "megaz", name: "MegaZ", price: 1000, boostDuration: 7.5, weight: 30, maxLoad: 50 }
+    { id: "vernier_1", name: "Vernier I", price: 200, boostDuration: 4.0, weight: 4, maxLoad: 15 },
+    { id: "turbo_1", name: "Turbo I", price: 350, boostDuration: 5.5, weight: 7, maxLoad: 25 },
+	{ id: "hammer_1", name: "Hammer", price: 400, boostDuration: 6.5, weight: 12, maxLoad: 30, spriteUrl: "assets/parts/backpack_hammer.png" },
+	{ id: "megaz", name: "MegaZ", price: 1000, boostDuration: 7.5, weight: 15, maxLoad: 50 }
   ]
 };
 

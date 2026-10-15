@@ -63,7 +63,7 @@ function fireWeapon(p, slot) {
   }
 
   const g = equippedGun();                           // ---------- ช่องปืน
-  const dmg = Math.max(1, Math.round(g.damage * atkMult()));
+  const dmg = Math.max(1, Math.round(g.damage * atkMult(g)));
   if (g.type === 'MELEE') return meleeSwing(p, g, dmg);
   if (g.type === 'SHOTGUN') {                        // g.pellets เม็ด กระจายเป็นรูปพัดรอบทิศเมาส์ อายุสั้น
     const n = g.pellets || 5;
@@ -193,7 +193,7 @@ function updateLaser(dt) {
 
   // damage ของเลเซอร์ในฐานข้อมูล = ต่อ 1 pulse (ทุก fireRate ms) แต่ใช้ผลทีละ LASER_TICK เพื่อไม่ให้เลขดาเมจรัวทุกเฟรม
   // จึงคูณชดเชยให้ DPS เท่ากัน: damage x (LASER_TICK / (fireRate/1000))
-  const dmg = Math.max(1, Math.round(lg.damage * (LASER_TICK / (lg.fireRate / 1000)) * atkMult()));
+  const dmg = Math.max(1, Math.round(lg.damage * (LASER_TICK / (lg.fireRate / 1000)) * atkMult(lg)));
   for (const b of beam) {
     for (const e of enemies.slice()) {           // ลำแสงทะลุ โดนทุกตัวบนเส้น (แต่ละเส้นทำดาเมจแยกกัน)
       if (untargetable(e)) continue;               // เครื่องล่องหน: ลำแสงทะลุผ่าน
@@ -223,7 +223,7 @@ function releaseEinshander(p) {
   const w = equippedMissile();
   if (w.type !== 'BEAM') return;
   const a = p.angle, ca = Math.cos(a), sa = Math.sin(a);
-  const bdmg = Math.max(1, Math.round(w.damage * atkMult()));
+  const bdmg = Math.max(1, Math.round(w.damage * atkMult(w)));
   for (const o of beamOrigins(p, w)) {
     let len = BEAM_SHOT_LEN;
     if (sa > 0.001 && (GROUND_Y - o.y) / sa < len) len = Math.max(0, (GROUND_Y - o.y) / sa);
@@ -364,7 +364,7 @@ function updateMissiles(dt) {
       for (const e of enemies) {
         if (sx >= e.x - 4 && sx <= e.x + e.w + 4 && sy >= e.y - 4 && sy <= e.y + e.h + 4) {
           spawnSparks(sx, sy, 5, '#ffd36b');
-          const killed = damageEnemy(e, Math.max(1, Math.round((m.dmg || MISSILE_DMG) * atkMult())), true);
+          const killed = damageEnemy(e, Math.max(1, Math.round((m.dmg || MISSILE_DMG) * atkMult(equippedMissile()))), true);
           if (!killed) knockEnemy(e, ca, sa);          // Knockback ตามทิศของมิสไซล์
           addShake(3);
           smallBoom(sx, sy, m.small ? 15 : 22);
