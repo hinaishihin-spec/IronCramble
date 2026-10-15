@@ -16,6 +16,8 @@ function makeBossFor(def, lockX) {
   if (def.kind === 'mimic') return makeMimic(startX, lockX);              // boss4.js
   if (def.kind === 'carrier') return makeCarrier(startX, lockX);          // boss5.js
   if (def.kind === 'megabolt') return makeMegaBolt(startX, lockX);        // boss6.js
+  if (def.kind === 'acewanzer') return makeAce(startX, lockX);            // boss7.js
+  if (def.kind === 'assembly') return makeAssemblyArm(startX, lockX);     // boss8.js
   return makeBoss(startX, lockX + W - BOSS_W - 24, lockX + W * 0.52);
 }
 
@@ -26,6 +28,8 @@ function updateBoss(e, dt, pcx, pcy) {
   else if (e.kind === 'mimic') updateMimic(e, dt, pcx, pcy);
   else if (e.kind === 'carrier') updateCarrier(e, dt, pcx, pcy);
   else if (e.kind === 'megabolt') updateMegaBolt(e, dt, pcx, pcy);
+  else if (e.kind === 'acewanzer') updateAce(e, dt, pcx, pcy);
+  else if (e.kind === 'assembly') updateAssemblyArm(e, dt, pcx, pcy);
   else updateFortress(e, dt, pcx, pcy);
 }
 
@@ -33,6 +37,7 @@ function drawBoss(e, sx, sy, flash) {
   if (drawEnemyArt(e, e.kind === 'carrier' && e.lift ? sx + (Math.random() - 0.5) * 3 * e.lift : sx, sy, flash)) {    // ภาพวาด assets/enemies/boss_<kind>.png (enemyart.js)
     if (e.kind === 'carrier') drawCarrierBeams(e);
     else if (e.kind === 'megabolt') drawMegaBoltBeam(e);
+    else if (e.kind === 'assembly') drawAssemblyFx(e);
     return;
   }
   if (e.kind === 'hopper') drawHopper(e, sx, sy, flash);
@@ -41,6 +46,8 @@ function drawBoss(e, sx, sy, flash) {
   else if (e.kind === 'mimic') drawMimic(e, sx, sy, flash);
   else if (e.kind === 'carrier') drawCarrier(e, sx, sy, flash);
   else if (e.kind === 'megabolt') drawMegaBolt(e, sx, sy, flash);
+  else if (e.kind === 'acewanzer') drawAce(e, sx, sy, flash);
+  else if (e.kind === 'assembly') drawAssemblyArm(e, sx, sy, flash);
   else drawFortress(e, sx, sy, flash);
 }
 

@@ -91,6 +91,14 @@ function updateEnemies(dt) {
     if (e.type === 'monolet') { updateMonolet(e, dt, pcx, pcy); continue; }     // enemy4.js
     if (e.type === 'tplane') { updateTPlane(e, dt, pcx, pcy); continue; }       // enemy4.js
     if (e.type === 'swanzer' || e.type === 'mwanzer') { updateWanzerE(e, dt, pcx, pcy); continue; }   // enemy5.js
+    if (e.type === 'shwanzer') { updateShieldWanzer(e, dt, pcx, pcy); continue; }   // enemy6.js
+    if (e.type === 'jammer') { updateJammer(e, dt, pcx, pcy); continue; }           // enemy6.js
+    if (e.type === 'repair') { updateRepair(e, dt, pcx, pcy); continue; }           // enemy6.js
+    if (e.type === 'mortar') { updateMortar(e, dt, pcx, pcy); continue; }           // enemy7.js
+    if (e.type === 'gatling') { updateGatling(e, dt, pcx, pcy); continue; }         // enemy7.js
+    if (e.type === 'welder') { updateWelder(e, dt, pcx, pcy); continue; }           // enemy8.js
+    if (e.type === 'minelayer') { updateMineLayer(e, dt, pcx, pcy); continue; }     // enemy8.js
+    if (e.type === 'dropship') { updateDropship(e, dt, pcx, pcy); continue; }       // enemy7.js
     if (e.type === 'fighter') { updateFighter(e, dt, pcx, pcy); continue; }     // boss3.js (ลูกน้อง Giant Bomber)
     if (e.type === 'launcher' || e.type === 'swarmer') { updateLauncher(e, dt, pcx, pcy); continue; }   // enemy3.js
 
@@ -277,6 +285,30 @@ function drawEnemies() {
       barY = sy - 18;
     } else if (e.type === 'swanzer' || e.type === 'mwanzer') {
       drawWanzerE(e, sx, sy, flash);
+      barY = sy - 16;
+    } else if (e.type === 'shwanzer') {
+      drawShieldWanzer(e, sx, sy, flash);
+      barY = sy - 16;
+    } else if (e.type === 'jammer') {
+      drawJammer(e, sx, sy, flash);
+      barY = sy - 18;
+    } else if (e.type === 'repair') {
+      drawRepair(e, sx, sy, flash);
+      barY = sy - 14;
+    } else if (e.type === 'mortar') {
+      drawMortar(e, sx, sy, flash);
+      barY = sy - 18;
+    } else if (e.type === 'gatling') {
+      drawGatling(e, sx, sy, flash);
+      barY = sy - 18;
+    } else if (e.type === 'welder') {
+      drawWelder(e, sx, sy, flash);
+      barY = sy - 14;
+    } else if (e.type === 'minelayer') {
+      drawMineLayer(e, sx, sy, flash);
+      barY = sy - 18;
+    } else if (e.type === 'dropship') {
+      drawDropship(e, sx, sy, flash);
       barY = sy - 16;
     } else if (e.type === 'fighter') {
       drawFighter(e, sx, sy, flash);

@@ -312,6 +312,7 @@ function updateBullets(dt) {
         if (sx >= e.x && sx <= e.x + e.w && sy >= e.y && sy <= e.y + e.h) {
           const bl = Math.hypot(b.vx, b.vy) || 1;
           impact(sx, sy, -b.vx / bl, -b.vy / bl);
+          e.hitX = sx; e.hitY = sy;                                      // จุดที่โดน (Shield Wanzer ใช้ตัดสินว่าโล่กันไหม enemy6.js)
           const killed = damageEnemy(e, b.dmg || mgDamage(), !!b.rifle, !!b.ap);
           if (b.kb && !killed) { const bl2 = Math.hypot(b.vx, b.vy) || 1; knockEnemy(e, b.vx / bl2 * b.kb, b.vy / bl2 * b.kb); }   // แรงผลักเม็ดลูกซอง (Winchester x1.5)
           if (b.pierce > 0) { b.pierce--; (b.hitList = b.hitList || []).push(e); continue; }

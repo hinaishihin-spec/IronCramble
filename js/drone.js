@@ -58,7 +58,7 @@ let droneFx = [];          // เส้นยิงชั่วคราว (ส
 function equippedDrone() { return findWeapon(profile.equippedWeapon.drone); }
 
 // เกจโล่สูงสุดของผู้เล่น: Charger ที่ยังไม่พังให้ x1.3
-function shieldMax() { return SHIELD_MAX * (drone && drone.kind === 'charger' && !drone.down ? drone.cfg.shieldMult : 1); }
+function shieldMax() { return SHIELD_MAX * (drone && drone.kind === 'charger' && !drone.down && !(drone.jam > 0) ? drone.cfg.shieldMult : 1); }
 
 function resetDrones() {
   droneShots = []; droneFx = [];
@@ -102,6 +102,8 @@ function updateDrones(dt) {
   const d = drone;
   if (!d) return;
   d.t += dt; d.flash = Math.max(0, d.flash - dt);
+  const jammed = d.jam > 0;                                    // ถูก Jammer Drone รบกวน: หยุดทำงานทุกอย่างชั่วคราว (ยังตามตัวอยู่)
+  d.jam = Math.max(0, (d.jam || 0) - dt);
   const cfg = d.cfg, pcx = player.x + player.w / 2, sgn = Math.cos(player.angle) >= 0 ? 1 : -1;
 
   if (d.bot && d.down) {                                      // โดรนบอทพัง: นับเวลากลับมา
@@ -131,6 +133,7 @@ function updateDrones(dt) {
 
   if (d.bot) droneBotHits(d, w, h);
   if (player.dead) return;
+  if (jammed) { if (d.kind === 'charger' && player.shield > shieldMax()) player.shield = shieldMax(); return; }
 
   if (d.kind === 'charger') { if (player.shield > shieldMax()) player.shield = shieldMax(); return; }
 
@@ -225,6 +228,7 @@ function updateDroneShots(dt) {
     for (const e of enemies) {
       if (untargetable(e)) continue;
       if (b.x >= e.x && b.x <= e.x + e.w && b.y >= e.y && b.y <= e.y + e.h) {
+        e.hitX = b.x; e.hitY = b.y;
         damageEnemy(e, droneDmg(b.dmg, e), false, false);
         spawnSparks(b.x, b.y, 2, '#ffb13b');
         hit = true; break;
@@ -253,6 +257,7 @@ function drawDrones() {
   const d = drone;
   if (!d || (d.bot && d.down) || player.dead) return;
   const col = DRONE_COLOR[d.kind], f = d.face, sx = d.x - cam, flash = d.flash > 0;
+  if (d.jam > 0 && Math.floor(performance.now() / 70) % 3 === 0) return;      // ภาพกระตุกตอนถูกรบกวน
   const img = droneArtImage(d);
   if (img) {                                                   // ภาพวาดของผู้เล่น (assets/drones/<kind>.png) แทนภาพโค้ด
     const bw = d.bot ? 22 : 24, bh = d.bot ? 26 : 14, dh = DRONE_ART_H[d.bot ? 'BOT' : 'FLY'], dw = img.naturalWidth * dh / img.naturalHeight;
@@ -325,7 +330,8 @@ function drawDroneHud() {
   ctx.fillStyle = col; ctx.fillText('DRONE  ' + d.name, 26, 230);
   ctx.fillStyle = '#b3bbb0';
   let st = 'READY';
-  if (d.bot && d.down) { st = 'REPAIR ' + Math.ceil(d.downT) + 's'; ctx.fillStyle = '#e0583a'; }
+  if (d.jam > 0) { st = 'JAMMED'; ctx.fillStyle = '#c58aff'; }
+  else if (d.bot && d.down) { st = 'REPAIR ' + Math.ceil(d.downT) + 's'; ctx.fillStyle = '#e0583a'; }
   else if (d.kind === 'recovery') st = d.quiet > 0 ? 'PAUSED' : (player.hp < maxHp() ? 'HEALING' : 'READY');
   else if (d.kind === 'charger') st = 'SHIELD x' + d.cfg.shieldMult;
   else if (d.bot) st = 'HP ' + Math.ceil(d.hp);

@@ -60,6 +60,15 @@ function spawnWave(wave) {
     else if (kind === 'monolet') e = makeMonolet(baseX + off);
     else if (kind === 'swanzer') e = makeShotWanzer(baseX + off);
     else if (kind === 'mwanzer') e = makeMissileWanzer(baseX + off);
+    else if (kind === 'shwanzer') e = makeShieldWanzer(baseX + off);
+    else if (kind === 'jammer') e = makeJammer(baseX + off, y || 110);               // ตัวเลขที่ 3 = ความสูงบิน
+    else if (kind === 'repair') e = makeRepair(baseX + off);
+    else if (kind === 'mortar') e = makeMortar(baseX + off);
+    else if (kind === 'gatling') e = makeGatling(baseX + off);
+    else if (kind === 'dropship') e = makeDropship(baseX + off, 'walker', y);          // ปล่อย Walker 2 ตัว  (ตัวเลขที่ 3 = ความสูงบิน)
+    else if (kind === 'dropshipw') e = makeDropship(baseX + off, 'swanzer', y);        // ปล่อย Shot Wanzer 2 ตัว
+    else if (kind === 'welder') e = makeWelder(baseX + off);
+    else if (kind === 'minelayer') e = makeMineLayer(baseX + off);
     else if (kind === 'tplane') e = makeTPlane(baseX + off, y || TPLANE_Y);          // ตัวเลขที่ 3 = ความสูงบิน
     else if (kind === 'launcher') e = makeLauncher(baseX + off, false);
     else if (kind === 'swarmer') e = makeLauncher(baseX + off, true);

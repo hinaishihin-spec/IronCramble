@@ -10,9 +10,10 @@
                ชนิด: 'walker' | 'drone' | 'tank' | 'chopper' | 'sniper'
                | 'bomber' (ตัวเลขที่ 3 = ความสูงบิน) | 'launcher' (รถมิสไซล์ลูกเดียว) | 'swarmer' (รถมิสไซล์ฝูง)
                | 'monolet' (หุ่นนกกระจอกเทศยิงเลเซอร์ กระโดดยิง) | 'tplane' (เครื่องบินล่องหนโฉบทิ้งระเบิด ตัวเลขที่ 3 = ความสูงบิน)
+               | 'shwanzer' (Shield Wanzer หุ่นถือโล่) | 'jammer' (โดรนรบกวนโดรนซัพพอร์ต ตัวเลขที่ 3 = ความสูงบิน) | 'repair' (หุ่นซ่อมศัตรู)
                | 'swanzer' (Shotgun Wanzer หุ่น Hammer ถือลูกซอง) | 'mwanzer' (Missile Wanzer หุ่น Hammer ยิงมิสไซล์ครั้งละ 2 นัด)
                (sniper: ตัวเลขที่ 2 = เยื้องเข้าซ้ายจากขอบจอขวา เมื่อมีสไนเปอร์หลายตัวในเวฟเดียว)
-   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber'|'mimic'|'carrier'|'megabolt' }
+   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber'|'mimic'|'carrier'|'megabolt'|'acewanzer'|'assembly' }
                ด่านที่มีบอส: จบเมื่อกำจัดบอสได้ (เวฟทั้งหมดต้องอยู่ก่อนระยะ at)
    scene       (ไม่บังคับ) ชื่อชุดภาพฉาก เช่น 'city' -> assets/bg/city_far.png ... ไม่ใส่ = m<เลขด่าน> แล้วถอยไปใช้ default (ดู scenery.js)
    ด่านจบเมื่อ: ทุกเวฟโผล่ครบแล้ว และกำจัดศัตรูหมดทุกตัว (หรือกำจัดบอสได้ ถ้าด่านมีบอส)
@@ -137,27 +138,73 @@ const MISSIONS = [
     id: 8, title: 'IRON THUNDER', name: 'MISSION 08  IRON THUNDER',
     lengthM: 1800, unlockAt: 7, bonusExp: 700, bonusGold: 1400,
     boss: { at: 1720, name: 'MEGA BOLT', kind: 'megabolt' },
-    waves: [      // ศัตรูชั่วคราว: ผสมจากด่าน 6-7 (เปลี่ยนทีหลังได้)
-      { at: 60,   units: [['swanzer', 0], ['monolet', 120]] },
-      { at: 170,  units: [['mwanzer', 0], ['tplane', 100, 84]] },
-      { at: 290,  units: [['monolet', 0], ['swanzer', 130], ['launcher', 220]] },
-      { at: 400,  units: [['tplane', 0, 82], ['mwanzer', 140], ['sniper', 0]] },
-      { at: 520,  units: [['swanzer', 0], ['swanzer', 120], ['monolet', 240], ['drone', 60, 140]] },
-      { at: 640,  units: [['mwanzer', 0], ['tank', 140], ['monolet', 260]] },
-      { at: 760,  units: [['tplane', 0, 84], ['tplane', 240, 108], ['swanzer', 120]] },
-      { at: 880,  units: [['mwanzer', 0], ['mwanzer', 130], ['swarmer', 220], ['chopper', 60]] },
-      { at: 1000, units: [['monolet', 0], ['monolet', 120], ['swanzer', 240], ['sniper', 0]] },
-      { at: 1120, units: [['swanzer', 0], ['mwanzer', 130], ['tplane', 60, 90], ['tank', 280]] },
-      { at: 1240, units: [['monolet', 0], ['mwanzer', 120], ['swanzer', 240], ['bomber', 60, 85]] },
-      { at: 1360, units: [['tplane', 0, 82], ['swanzer', 110], ['mwanzer', 230], ['launcher', 330]] },
-      { at: 1480, units: [['monolet', 0], ['monolet', 120], ['mwanzer', 240], ['swanzer', 360], ['sniper', 0]] },
-      { at: 1600, units: [['swanzer', 0], ['swanzer', 120], ['mwanzer', 240], ['tank', 380]] },
-      { at: 1680, units: [['monolet', 0], ['mwanzer', 130], ['swanzer', 260]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1720 m)
+    waves: [      // Mortar / Gatling Crawler / Dropship ค่อยๆ เข้ามา ท้ายด่านผสมศัตรูเก่า  เวฟสุดท้ายเป็น Gatling คู่ อุ่นเครื่องก่อน Mega Bolt
+      { at: 60,   units: [['mortar', 0], ['walker', 150]] },
+      { at: 170,  units: [['mortar', 0], ['mwanzer', 140]] },
+      { at: 290,  units: [['gatling', 0], ['swanzer', 170]] },
+      { at: 400,  units: [['dropship', 0, 92], ['mortar', 130]] },
+      { at: 520,  units: [['gatling', 0], ['mortar', 170], ['monolet', 290]] },
+      { at: 640,  units: [['dropshipw', 0, 92], ['tank', 160]] },
+      { at: 760,  units: [['mortar', 0], ['mortar', 150], ['gatling', 290]] },
+      { at: 880,  units: [['dropship', 0, 88], ['mwanzer', 110], ['gatling', 250], ['sniper', 0]] },
+      { at: 1000, units: [['gatling', 0], ['monolet', 140], ['mortar', 270], ['drone', 60, 140]] },
+      { at: 1120, units: [['dropshipw', 0, 92], ['mortar', 130], ['launcher', 300]] },
+      { at: 1240, units: [['gatling', 0], ['gatling', 180], ['mortar', 340]] },
+      { at: 1360, units: [['dropship', 0, 90], ['dropshipw', 220, 104], ['mwanzer', 120]] },
+      { at: 1480, units: [['mortar', 0], ['gatling', 130], ['swanzer', 270], ['tank', 390], ['sniper', 0]] },
+      { at: 1600, units: [['dropshipw', 0, 90], ['gatling', 130], ['mortar', 250], ['monolet', 370]] },
+      { at: 1680, units: [['gatling', 0], ['gatling', 200]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1720 m)
+    ]
+  },
+  {
+    id: 9, title: 'CRIMSON RAIN', name: 'MISSION 09  CRIMSON RAIN',
+    lengthM: 1900, unlockAt: 8, bonusExp: 800, bonusGold: 1600,
+    boss: { at: 1820, name: 'ACE WANZER', kind: 'acewanzer' },
+    waves: [      // Shield Wanzer / Jammer Drone / Repair Unit ค่อยๆ เข้ามาทีละแบบ แล้วผสมกับศัตรูเก่า
+      { at: 60,   units: [['shwanzer', 0], ['walker', 110]] },
+      { at: 170,  units: [['shwanzer', 0], ['monolet', 140]] },
+      { at: 290,  units: [['jammer', 0, 110], ['swanzer', 120], ['walker', 220]] },
+      { at: 400,  units: [['shwanzer', 0], ['mwanzer', 160], ['jammer', 40, 100]] },
+      { at: 520,  units: [['repair', 0], ['shwanzer', 120], ['swanzer', 240]] },
+      { at: 640,  units: [['tank', 0], ['repair', 120], ['jammer', 60, 120], ['monolet', 250]] },
+      { at: 760,  units: [['shwanzer', 0], ['shwanzer', 130], ['mwanzer', 260]] },
+      { at: 880,  units: [['tplane', 0, 84], ['repair', 100], ['swanzer', 200], ['shwanzer', 320]] },
+      { at: 1000, units: [['jammer', 0, 105], ['jammer', 120, 135], ['mwanzer', 200], ['tank', 330]] },
+      { at: 1120, units: [['shwanzer', 0], ['repair', 110], ['monolet', 230], ['swanzer', 330]] },
+      { at: 1240, units: [['mwanzer', 0], ['shwanzer', 140], ['jammer', 60, 110], ['sniper', 0]] },
+      { at: 1360, units: [['shwanzer', 0], ['shwanzer', 120], ['repair', 240], ['mwanzer', 340]] },
+      { at: 1480, units: [['tplane', 0, 84], ['jammer', 100, 120], ['swanzer', 200], ['repair', 320], ['tank', 420]] },
+      { at: 1600, units: [['shwanzer', 0], ['mwanzer', 130], ['shwanzer', 260], ['repair', 380], ['jammer', 60, 105]] },
+      { at: 1720, units: [['swanzer', 0], ['shwanzer', 120], ['mwanzer', 250], ['monolet', 380]] },
+      { at: 1780, units: [['shwanzer', 0], ['mwanzer', 140], ['jammer', 60, 115]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1820 m)
+    ]
+  },
+  {
+    id: 10, title: 'WEAPONS FACTORY', name: 'MISSION 10  WEAPONS FACTORY',
+    lengthM: 2000, unlockAt: 9, bonusExp: 900, bonusGold: 1800,
+    boss: { at: 1920, name: 'ASSEMBLY ARM', kind: 'assembly' },
+    waves: [      // Welder Bot / Mine Layer ค่อยๆ เข้ามา แล้วผสมศัตรูเก่า  บอสท้ายด่านเป็นแขนกลประกอบหุ่น
+      { at: 60,   units: [['welder', 0], ['walker', 150]] },
+      { at: 170,  units: [['minelayer', 0], ['welder', 170]] },
+      { at: 290,  units: [['minelayer', 0], ['swanzer', 150], ['welder', 270]] },
+      { at: 400,  units: [['welder', 0], ['welder', 120], ['drone', 60, 140]] },
+      { at: 520,  units: [['minelayer', 0], ['shwanzer', 140], ['mortar', 290]] },
+      { at: 640,  units: [['welder', 0], ['minelayer', 150], ['gatling', 300]] },
+      { at: 760,  units: [['dropshipw', 0, 92], ['minelayer', 130], ['welder', 270]] },
+      { at: 880,  units: [['welder', 0], ['shwanzer', 120], ['repair', 270], ['minelayer', 350]] },
+      { at: 1000, units: [['minelayer', 0], ['minelayer', 150], ['mwanzer', 290], ['sniper', 0]] },
+      { at: 1120, units: [['gatling', 0], ['welder', 140], ['welder', 240], ['jammer', 60, 110]] },
+      { at: 1240, units: [['tplane', 0, 84], ['minelayer', 120], ['shwanzer', 250], ['welder', 370]] },
+      { at: 1360, units: [['minelayer', 0], ['mortar', 150], ['welder', 280], ['welder', 390], ['repair', 460]] },
+      { at: 1480, units: [['dropship', 0, 90], ['gatling', 140], ['minelayer', 290], ['mwanzer', 410]] },
+      { at: 1600, units: [['welder', 0], ['welder', 110], ['shwanzer', 240], ['minelayer', 350], ['tank', 450]] },
+      { at: 1720, units: [['welder', 0], ['welder', 120], ['welder', 240], ['minelayer', 360], ['mwanzer', 450]] },
+      { at: 1840, units: [['minelayer', 0], ['welder', 130], ['welder', 250], ['shwanzer', 370]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1920 m)
     ]
   }
 ];
 
-const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', monolet: 'Monolet Bot', tplane: 'Tactical Plane', swanzer: 'Shotgun Wanzer', mwanzer: 'Missile Wanzer', boss: 'BOSS' };
+const ENEMY_LABEL = { walker: 'หุ่นเดินดิน', drone: 'โดรน', tank: 'Heavy Tank', chopper: 'เฮลิคอปเตอร์', sniper: 'สไนเปอร์', bomber: 'เครื่องบินทิ้งระเบิด', launcher: 'รถยิงมิสไซล์', swarmer: 'รถมิสไซล์ฝูง', monolet: 'Monolet Bot', tplane: 'Tactical Plane', swanzer: 'Shotgun Wanzer', mwanzer: 'Missile Wanzer', shwanzer: 'Shield Wanzer', jammer: 'Jammer Drone', repair: 'Repair Unit', welder: 'Welder Bot', minelayer: 'Mine Layer', mortar: 'Mortar Crawler', gatling: 'Gatling Crawler', dropship: 'Dropship', dropshipw: 'Dropship (Wanzer)', boss: 'BOSS' };
 
 // ---------- การเลือกด่าน (ค่าอยู่ในหน่วยความจำ ไม่ได้เซฟ) ----------
 let selectedMission = -1;            // -1 = ยังไม่ได้เลือก -> Hangar จะเลือกด่านล่าสุดที่ปลดล็อกให้
@@ -181,7 +228,7 @@ function currentMission() { ensureValidSelection(); return MISSIONS[selectedMiss
 
 // นับศัตรูทั้งหมดของด่าน แยกตามชนิด เช่น { walker: 2, drone: 2, tank: 0, boss: 0, total: 4 } (บอสนับเป็น 1 ตัว)
 function missionTotals(m) {
-  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, monolet: 0, tplane: 0, swanzer: 0, mwanzer: 0, boss: 0, total: 0 };
+  const t = { walker: 0, drone: 0, tank: 0, chopper: 0, sniper: 0, bomber: 0, launcher: 0, swarmer: 0, monolet: 0, tplane: 0, swanzer: 0, mwanzer: 0, shwanzer: 0, jammer: 0, repair: 0, mortar: 0, gatling: 0, dropship: 0, dropshipw: 0, welder: 0, minelayer: 0, boss: 0, total: 0 };
   for (const w of m.waves) for (const u of w.units) { t[u[0]]++; t.total++; }
   if (m.boss) { t.boss = 1; t.total++; }
   return t;
@@ -191,7 +238,7 @@ function missionTotals(m) {
 function missionSummaryText(m) {
   const t = missionTotals(m);
   const parts = [];
-  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer', 'monolet', 'tplane', 'swanzer', 'mwanzer']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
+  for (const k of ['walker', 'drone', 'tank', 'chopper', 'sniper', 'bomber', 'launcher', 'swarmer', 'monolet', 'tplane', 'swanzer', 'mwanzer', 'shwanzer', 'jammer', 'repair', 'mortar', 'gatling', 'dropship', 'dropshipw', 'welder', 'minelayer']) if (t[k] > 0) parts.push(ENEMY_LABEL[k] + ' ' + t[k]);
   if (m.boss) parts.push(/^BOSS/.test(m.boss.name) ? m.boss.name : 'BOSS ' + m.boss.name);
   return parts.join(' / ');
 }

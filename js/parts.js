@@ -21,31 +21,31 @@ const WANZER_PARTS = {
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 0, energy: 100, maxLoad: 30 },
     { id: "zeriot_1", name: "Zeriot I", price: 250, hpBonus: 30, energy: 100, maxLoad: 50 },
     { id: "hammer_1", name: "Hammer I", price: 350, hpBonus: 70, energy: 70, maxLoad: 80, spriteUrl: "assets/parts/body_hammer.png" },
-	{ id: "megaz", name: "MegaZ", price: 1000, hpBonus: 100, energy: 100, maxLoad: 100, spriteUrl: "assets/parts/body_megaz.png" }
+	{ id: "megaz", name: "MegaZ", price: 1000, hpBonus: 100, energy: 130, maxLoad: 100, spriteUrl: "assets/parts/body_megaz.png" }
   ],
   ARMS: [
     { id: "basic", name: "Basic Block", price: 0, damageBonus: 1.0, weight: 0 },
     { id: "zeriot_1", name: "Zeriot I", price: 150, damageBonus: 1.05, weight: 8 },
     { id: "hammer_1", name: "Hammer I", price: 200, damageBonus: 1.15, weight: 15, spriteUrl: "assets/parts/arms_hammer.png" },
-	{ id: "megaz", name: "MegaZ", price: 1000, damageBonus: 2.0, weight: 30, spriteUrl: "assets/parts/arms_megaz.png" }
+	{ id: "megaz", name: "MegaZ", price: 1000, damageBonus: 1.4, weight: 30, spriteUrl: "assets/parts/arms_megaz.png" }
   ],
   LEGS: [
     { id: "basic", name: "Basic Block", price: 0, speedBonus: 1.0, boostBonus: 1.0, weight: 0,  maxLoad: 0 },
     { id: "zeriot_1", name: "Zeriot I", price: 150, speedBonus: 1.1, boostBonus: 1.1, weight: 10,  maxLoad: 8 },
     { id: "hammer_1", name: "Hammer I", price: 200, speedBonus: 0.9, boostBonus: 0.8, weight: 25,  maxLoad: 30, spriteUrl: "assets/parts/legs_hammer.png" },
-	{ id: "megaz", name: "MegaZ", price: 1000, speedBonus: 1.8, boostBonus: 1.6, weight: 50,  maxLoad: 60, spriteUrl: "assets/parts/legs_megaz.png" }
+	{ id: "megaz", name: "MegaZ", price: 1000, speedBonus: 1.4, boostBonus: 1.3, weight: 50,  maxLoad: 60, spriteUrl: "assets/parts/legs_megaz.png" }
   ],
   SHOULDERS: [
     { id: "basic", name: "Basic Block", price: 0, hpBonus: 10, weight: 0, spriteUrl: "assets/parts/basic_shoulder.png" },
-    { id: "zeriot_1", name: "Zeriot Shoulder I", price: 100, hpBonus: 10, weight: 4, spriteUrl: "assets/shoulder_zeriot.png" },
-    { id: "hammer_1", name: "Hammer Shoulder I", price: 180, hpBonus: 25, weight: 12, spriteUrl: "assets/shoulder_hammer.png" },
+    { id: "zeriot_1", name: "Zeriot Shoulder I", price: 100, hpBonus: 18, weight: 4, spriteUrl: "assets/parts/shoulder_zeriot.png" },
+    { id: "hammer_1", name: "Hammer I", price: 180, hpBonus: 25, weight: 12, spriteUrl: "assets/parts/shoulder_hammer.png" },
 	{ id: "megaz", name: "MegaZ Shoulder", price: 1000, hpBonus: 50, weight: 30, spriteUrl: "assets/parts/shoulder_megaz.png" }
   ],
   BACKPACK: [
     { id: "basic", name: "Basic Block", price: 0, boostDuration: 3.0, weight: 0, maxLoad: 0 },
     { id: "vernier_1", name: "Vernier I", price: 200, boostDuration: 4.0, weight: 8, maxLoad: 15 },
     { id: "turbo_1", name: "Turbo I", price: 350, boostDuration: 5.5, weight: 15, maxLoad: 25 },
-	{ id: "hammer_1", name: "Hammer", price: 400, boostDuration: 6.0, weight: 23, maxLoad: 30, spriteUrl: "assets/parts/backpack_hammer.png" },
+	{ id: "hammer_1", name: "Hammer", price: 400, boostDuration: 6.5, weight: 23, maxLoad: 30, spriteUrl: "assets/parts/backpack_hammer.png" },
 	{ id: "megaz", name: "MegaZ", price: 1000, boostDuration: 7.5, weight: 30, maxLoad: 50 }
   ]
 };
