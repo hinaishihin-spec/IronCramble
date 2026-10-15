@@ -3,7 +3,7 @@
    enemyart.js : ตัวโหลดภาพวาดของศัตรู/บอส  (วางไฟล์แล้วใช้แทนภาพโค้ดเดิมทันที ไม่มีไฟล์ = ใช้ภาพโค้ดเดิม ทีละตัวได้)
    ไฟล์: assets/enemies/<ชื่อ>.png   (PNG โปร่งใส วาดให้หัน "ซ้าย" โค้ดพลิกให้เองตามทิศที่ศัตรูหัน)
      ศัตรูทั่วไป: walker drone tank chopper sniper bomber monolet tplane swanzer mwanzer launcher swarmer fighter
-     บอส:         boss_fortress boss_hopper boss_sniper boss_bomber boss_mimic boss_carrier
+     บอส:         boss_fortress boss_hopper boss_sniper boss_bomber boss_mimic boss_carrier boss_megabolt
        (Fortress/Bomber ที่แยกออกจาก Giant Carrier ในด่าน 7 ใช้ภาพ boss_fortress / boss_bomber ชุดเดียวกัน)
    เฟรมแอนิเมชัน (ไม่บังคับ): <ชื่อ>_2.png, <ชื่อ>_3.png ... (สูงสุด 6 เฟรม) สลับวนตามเวลา  ความเร็ว = fps ใน ENEMY_ART
    ขนาดที่วางในเกม: สูง = ความสูงกรอบโดนยิงของศัตรู x scale  กว้างตามสัดส่วนภาพ  ชิดล่างของกรอบ กึ่งกลางกรอบ
@@ -25,7 +25,7 @@ const ENEMY_BAR = { walker: 12, drone: 18, tank: 22, chopper: 24, sniper: 14, bo
 const ENEMY_BOX = {
   walker: [38, 46], drone: [34, 22], tank: [64, 36], chopper: [60, 26], sniper: [30, 50], bomber: [80, 24], monolet: [42, 72], tplane: [92, 22],
   swanzer: [40, 70], mwanzer: [40, 70], launcher: [76, 40], swarmer: [76, 40], fighter: [36, 14],
-  boss_fortress: [120, 120], boss_hopper: [150, 64], boss_sniper: [84, 130], boss_bomber: [190, 50], boss_mimic: [54, 96], boss_carrier: [230, 134]
+  boss_fortress: [120, 120], boss_hopper: [150, 64], boss_sniper: [84, 130], boss_bomber: [190, 50], boss_mimic: [54, 96], boss_carrier: [230, 134], boss_megabolt: [250, 150]
 };
 
 const ART_WHITE = new Map();        // ภาพ -> เงาขาว (ตอนโดนยิงกะพริบ)

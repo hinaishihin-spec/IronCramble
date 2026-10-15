@@ -14,8 +14,8 @@ const REQUIRED_SYMBOLS = [
   ['config.js', 'TPLANE_REVEAL'], ['config.js', 'MONO_W'], ['parts.js', 'WANZER_PARTS'], ['partext.js', 'partLock'], ['series_zeus.js', 'WANZER_PARTS'],
   ['crouch.js', 'updateCrouch'], ['weapondb.js', 'WEAPON_DATABASE'], ['save.js', 'Save'], ['input.js', 'keys'],
   ['player.js', 'updatePlayer'], ['enemy.js', 'updateEnemies'], ['enemy2.js', 'updateSniper'], ['enemy3.js', 'updateBomber'],
-  ['enemy4.js', 'makeMonolet'], ['enemy5.js', 'makeShotWanzer'], ['enemy4.js', 'untargetable'], ['boss3.js', 'makeGiantBomber'], ['boss4.js', 'makeMimic'], ['boss5.js', 'makeCarrier'], ['enemyart.js', 'drawEnemyArt'], ['scenery.js', 'sceneImage'],
-  ['weapons.js', 'fireWeapon'], ['missions.js', 'MISSIONS'], ['mission.js', 'updateGame'], ['ui.js', 'drawHUD'],
+  ['enemy4.js', 'makeMonolet'], ['enemy5.js', 'makeShotWanzer'], ['enemy4.js', 'untargetable'], ['boss3.js', 'makeGiantBomber'], ['boss4.js', 'makeMimic'], ['boss5.js', 'makeCarrier'], ['boss6.js', 'makeMegaBolt'], ['drone.js', 'updateDrones'], ['enemyart.js', 'drawEnemyArt'], ['scenery.js', 'sceneImage'],
+  ['weapons.js', 'fireWeapon'], ['strike.js', 'startStrike'], ['missions.js', 'MISSIONS'], ['mission.js', 'updateGame'], ['ui.js', 'drawHUD'],
   ['hangar.js', 'HangarScene'], ['saves.js', 'SaveScene'], ['scenes.js', 'Scenes'], ['gamepad.js', 'pollGamepad'], ['audio.js', 'sfxUpdate']
 ];
 const problems = [];
@@ -25,7 +25,7 @@ for (const r of REQUIRED_SYMBOLS) {
   if (t === 'undefined' && problems.indexOf(r[0]) < 0) problems.push(r[0]);
 }
 if (!problems.length) {                                    // ไฟล์ครบ แต่ยังเป็นรุ่นเก่า: เช็กว่า missions.js มีด่าน 6 หรือไม่
-  try { if (MISSIONS.length < 7 || !MISSIONS[5].boss) problems.push('missions.js (รุ่นเก่า ไม่มีด่าน 7/บอสด่าน 6)'); } catch (e) { }
+  try { if (MISSIONS.length < 8 || !MISSIONS[5].boss) problems.push('missions.js (รุ่นเก่า ไม่มีด่าน 8/บอสด่าน 6)'); } catch (e) { }
 }
 
 let lastErr = null, errT = 0;

@@ -73,19 +73,59 @@ const WEAPON_DATABASE = {
       // beams = จำนวนเส้น (damage = ต่อเส้น)  charge/cd = เวลาชาร์จ/คูลดาวน์ของรุ่นนี้ (ไม่ใส่ = BEAM_CHARGE / MISSILE_DELAYS.BEAM)  gap = ระยะห่างเส้นขนาน (px)  unlock = ล็อกจนกว่าชนะบอสด่านนั้นครบกี่ครั้ง (ดู weaponLock)
       { id: "einshander_1", name: "Einshander I", price: 1200, damage: 60, weight: 20 },
       { id: "sweihander_1", name: "Sweihander I", price: 2200, damage: 50, beams: 2, gap: 16, weight: 30, charge: 0.45, cd: 1.8, unlock: { mission: 5, clears: 5 } }
+    ],
+    // อาวุธโจมตีเป็นจุดจากฟ้า (ดู strike.js)  cd = คูลดาวน์ (วินาที) ยิ่งรุ่นสูงยิ่งสั้น: รุ่น I = 25 / II = 20 / III = 15  delay = เวลาหน่วงก่อนตก
+    // ORBITAL: damage ต่อติ๊ก (3 ติ๊ก) radius = ครึ่งความกว้างเสาแสง   NAPALM: damage = แรงระเบิด burn = ดาเมจไฟต่อติ๊ก (ทุก NAPALM_TICK วินาที) fireLife = ไฟลุกกี่วินาที
+    ORBITAL: [
+      { id: "xbreaker_1", name: "X-Breaker I", price: 3000, damage: 90, radius: 38, cd: 15, delay: 1.3, weight: 28, unlock: { mission: 8, clears: 5 } }
+    ],
+    NAPALM: [
+      { id: "burningrave_1", name: "Burning Rave", price: 2400, damage: 60, burn: 14, fireLife: 6, cd: 20, delay: 1.2, weight: 26, unlock: { mission: 8, clears: 5 } }
+    ]
+  },
+  // โดรนซัพพอร์ต (ช่องที่ 3 เลือกได้ทีละตัว ถอดได้ด้วยการกดตัวที่สวมอยู่) พฤติกรรมอยู่ drone.js  kind = ชนิดการทำงาน  desc = คำอธิบายสั้นในแถว
+  DRONES: {
+    FLY: [
+      { id: "striker_d1", name: "Striker I", kind: "striker", tier: 1, price: 800, weight: 6, desc: "ปืนกลอัตโนมัติ", unlock: { mission: 5, clears: 5 } },
+      { id: "striker_d2", name: "Striker II", kind: "striker", tier: 2, price: 1400, weight: 7, desc: "ยิงถี่ขึ้น", unlock: { mission: 8, clears: 5 } },
+      { id: "striker_d3", name: "Striker III", kind: "striker", tier: 3, price: 2100, weight: 8, desc: "ยิงเป็นชุด 3 นัด", unlock: { mission: 9, clears: 5 } },
+      { id: "sniper_d1", name: "Sniper I", kind: "sniper", tier: 1, price: 1400, weight: 7, desc: "สไนป์นัดแรง ทุก 3 วิ", unlock: { mission: 6, clears: 5 } },
+      { id: "sniper_d2", name: "Sniper II", kind: "sniper", tier: 2, price: 2400, weight: 8, desc: "แรงขึ้น ยิงถี่ขึ้น", unlock: { mission: 8, clears: 5 } },
+      { id: "sniper_d3", name: "Sniper III", kind: "sniper", tier: 3, price: 3600, weight: 9, desc: "กระสุนทะลุหลายตัว", unlock: { mission: 9, clears: 5 } },
+      { id: "recovery_d1", name: "Recovery I", kind: "recovery", tier: 1, price: 1600, weight: 8, desc: "ฟื้น HP ทีละนิด", unlock: { mission: 7, clears: 5 } },
+      { id: "recovery_d2", name: "Recovery II", kind: "recovery", tier: 2, price: 2700, weight: 9, desc: "ฟื้น HP เร็วขึ้น", unlock: { mission: 8, clears: 5 } },
+      { id: "recovery_d3", name: "Recovery III", kind: "recovery", tier: 3, price: 4200, weight: 10, desc: "ฟื้น HP+โล่ หยุดฟื้นสั้นลง", unlock: { mission: 9, clears: 5 } }
+    ],
+    BOT: [
+      { id: "shooter_d1", name: "Shooter I", kind: "shooter", tier: 1, price: 1000, weight: 10, desc: "ยิงเลเซอร์", unlock: { mission: 5, clears: 5 } },
+      { id: "shooter_d2", name: "Shooter II", kind: "shooter", tier: 2, price: 1700, weight: 11, desc: "เลเซอร์ 2 เส้น", unlock: { mission: 8, clears: 5 } },
+      { id: "shooter_d3", name: "Shooter III", kind: "shooter", tier: 3, price: 2600, weight: 12, desc: "เลเซอร์ 2 เส้นทะลุ", unlock: { mission: 9, clears: 5 } },
+      { id: "assaulter_d1", name: "Assaulter I", kind: "assaulter", tier: 1, price: 1600, weight: 12, desc: "ยิงมิสไซล์ล็อกเป้า", unlock: { mission: 6, clears: 5 } },
+      { id: "assaulter_d2", name: "Assaulter II", kind: "assaulter", tier: 2, price: 2700, weight: 13, desc: "มิสไซล์ 2 นัด", unlock: { mission: 8, clears: 5 } },
+      { id: "assaulter_d3", name: "Assaulter III", kind: "assaulter", tier: 3, price: 4200, weight: 14, desc: "มิสไซล์ 3 นัด", unlock: { mission: 9, clears: 5 } },
+      { id: "charger_d1", name: "Charger I", kind: "charger", tier: 1, price: 1800, weight: 12, desc: "โล่หนาขึ้น x1.3", unlock: { mission: 7, clears: 5 } },
+      { id: "charger_d2", name: "Charger II", kind: "charger", tier: 2, price: 3100, weight: 13, desc: "โล่หนาขึ้น x1.5", unlock: { mission: 8, clears: 5 } },
+      { id: "charger_d3", name: "Charger III", kind: "charger", tier: 3, price: 4700, weight: 14, desc: "โล่ x1.5 บอทอึดขึ้น ฟื้นไว", unlock: { mission: 9, clears: 5 } }
     ]
   }
 };
 
 // ---------- ค่าที่ใช้ยิงจริง (ปรับสมดุลที่นี่) ----------
-const WEAPON_SLOTS_LIST = ['gun', 'missile'];                       // ปุ่ม 1 = ปืน, ปุ่ม 2 = มิสไซล์
-const WEAPON_SLOT_LABEL = { gun: 'ปืน', missile: 'มิสไซล์' };
-const WEAPON_TYPE_LABEL = { MACHINE_GUN: 'ปืนกล', SHOTGUN: 'ลูกซอง', RIFLE: 'ไรเฟิล', LASER: 'เลเซอร์', MELEE: 'ประชิด', SINGLE: 'Single', DUAL: 'Dual', SWARM: 'Swarm', BEAM: 'Beam' };
+const WEAPON_SLOTS_LIST = ['gun', 'missile', 'drone'];             // ปุ่ม 1 = ปืน, ปุ่ม 2 = มิสไซล์, ช่องที่ 3 = โดรน (ไม่มีปุ่มยิง ทำงานเอง)
+const WEAPON_SLOT_LABEL = { gun: 'ปืน', missile: 'มิสไซล์', drone: 'โดรน' };
+const WEAPON_TYPE_LABEL = { MACHINE_GUN: 'ปืนกล', SHOTGUN: 'ลูกซอง', RIFLE: 'ไรเฟิล', LASER: 'เลเซอร์', MELEE: 'ประชิด', SINGLE: 'Single', DUAL: 'Dual', SWARM: 'Swarm', BEAM: 'Beam', ORBITAL: 'Orbital', NAPALM: 'Napalm', FLY: 'โดรนบิน', BOT: 'โดรนบอท' };
 const MISSILE_DELAYS = { SINGLE: 0.9, DUAL: 1.1, SWARM: 1.5, BEAM: 1.4 };       // วินาที (ฐานข้อมูลมิสไซล์ไม่มี fireRate)
 const RIFLE_SPEED = 1700;       // px/s กระสุนไรเฟิลเร็วกว่าปืนกลเกือบสองเท่า
 const RIFLE_LIFE = 0.9;
 const RIFLE_PIERCE = 2;         // ทะลุศัตรูได้เพิ่มอีก 2 ตัว (โดนรวม 3 ตัว)
 const FOSTECH_STEP = 7 * Math.PI / 180;   // Fostech กระจายกว้างกว่าลูกซองทั่วไป (7° ต่อเม็ด)
+// อาวุธโจมตีจากฟ้า (strike.js): ดาเมจใส่บอสคูณ STRIKE_BOSS_MULT / ทำร้ายผู้เล่นที่ยืนในจุดตก (STRIKE_SELF_DMG, กางโล่ลดได้)
+const STRIKE_BOSS_MULT = 0.4;
+const STRIKE_SELF_DMG = 22, STRIKE_SELF_SHIELD = 14;
+const ORBITAL_TICKS = 3, ORBITAL_TICK_GAP = 0.2;                       // เสาแสงโดน 3 ติ๊ก ห่างกัน 0.2 วินาที
+const NAPALM_SPREAD = 85, NAPALM_BOMB_GAP = 0.15;                       // ระเบิด 3 ลูกห่างกัน (px) / ตกต่างกันกี่วินาที
+const NAPALM_BLAST_R = 55, NAPALM_PATCH_HW = 55;                        // รัศมีระเบิด / ครึ่งความกว้างกองไฟ
+const NAPALM_TICK = 0.25, NAPALM_SELF_DMG = 6, NAPALM_SELF_SHIELD = 3;  // ไฟเผาทุกกี่วินาที / ดาเมจต่อติ๊กที่ผู้เล่น (กระโดดข้ามไฟได้)
 const BEAM_SHOT_LEN = 780;       // ระยะเลเซอร์ไหล่ (px) ยาวข้ามจอ
 const BEAM_CHARGE = 0.35;        // วินาทีที่ชาร์จแสงที่ไหล่ก่อนยิง (คูลดาวน์นับต่อจากตอนปล่อย)
 const BEAM_SHOT_LIFE = 0.28;     // วินาทีที่ลำแสงค้างจางหายบนจอ (ดาเมจโดนทีเดียวตอนยิง)
@@ -95,7 +135,7 @@ const STARTER_WEAPONS = { gun: 'ak_1', missile: 'single_1' };        // ติ�
 // รายการแบนของอาวุธทั้งหมด: { slot:'gun'|'missile', type:'MACHINE_GUN'..., ...ข้อมูลเดิม }
 const WEAPON_FLAT = (function () {
   const out = [];
-  const groups = { gun: WEAPON_DATABASE.GUNS, missile: WEAPON_DATABASE.MISSILES };
+  const groups = { gun: WEAPON_DATABASE.GUNS, missile: WEAPON_DATABASE.MISSILES, drone: WEAPON_DATABASE.DRONES };
   for (const slot of WEAPON_SLOTS_LIST) {
     for (const type in groups[slot]) for (const w of groups[slot][type]) out.push(Object.assign({ slot: slot, type: type }, w));
   }
@@ -108,18 +148,18 @@ function findWeapon(id) {
   return null;
 }
 function defaultOwnedWeapons() { return [STARTER_WEAPONS.gun, STARTER_WEAPONS.missile]; }
-function defaultEquippedWeapon() { return { gun: STARTER_WEAPONS.gun, missile: STARTER_WEAPONS.missile }; }
+function defaultEquippedWeapon() { return { gun: STARTER_WEAPONS.gun, missile: STARTER_WEAPONS.missile, drone: null }; }
 
 function weaponOwned(id) { return profile.ownedWeapons.indexOf(id) >= 0; }
-function weaponEquipped(id) { return profile.equippedWeapon.gun === id || profile.equippedWeapon.missile === id; }
+function weaponEquipped(id) { return profile.equippedWeapon.gun === id || profile.equippedWeapon.missile === id || profile.equippedWeapon.drone === id; }
 function equippedGun() { return findWeapon(profile.equippedWeapon.gun) || findWeapon(STARTER_WEAPONS.gun); }
 function equippedMissile() { return findWeapon(profile.equippedWeapon.missile) || findWeapon(STARTER_WEAPONS.missile); }
 
 // น้ำหนักอาวุธทั้ง 2 ช่อง (eq = { gun, missile } ไม่ใส่ = ที่สวมอยู่ตอนนี้) ถูกรวมเข้า calculateTotalWeight() ใน parts.js
 function weaponsWeight(eq) {
   eq = eq || profile.equippedWeapon;
-  const g = findWeapon(eq.gun), m = findWeapon(eq.missile);
-  return (g ? g.weight : 0) + (m ? m.weight : 0);
+  const g = findWeapon(eq.gun), m = findWeapon(eq.missile), d = findWeapon(eq.drone);
+  return (g ? g.weight : 0) + (m ? m.weight : 0) + (d ? d.weight : 0);
 }
 
 // ถ้าอาวุธนี้ยังล็อกอยู่ คืน { mission, need, have, left } / ไม่มีเงื่อนไขหรือปลดแล้ว = null (ซื้อแล้วไม่โดนล็อกย้อนหลัง)
@@ -143,6 +183,11 @@ function buyOrEquipWeapon(id) {
   const w = findWeapon(id);
   if (!w) return { ok: false, msg: 'ไม่พบอาวุธนี้' };
   const st = weaponState(id);
+  if (st === 'equipped' && w.slot === 'drone') {      // โดรน: กดตัวที่สวมอยู่ = ถอดออก (ไม่ใช้โดรน)
+    profile.equippedWeapon.drone = null;
+    saveProfile();
+    return { ok: true, msg: 'ถอด ' + w.name + ' แล้ว (ไม่ใช้โดรน)' };
+  }
   if (st === 'equipped') return { ok: false, msg: 'สวม ' + w.name + ' อยู่แล้ว' };
   if (st === 'locked') { const lk = weaponLock(id); return { ok: false, msg: 'ยังล็อก: ต้องชนะบอสด่าน ' + lk.mission + ' อีก ' + lk.left + ' ครั้ง (' + lk.have + ' / ' + lk.need + ')' }; }
   if (st === 'poor') return { ok: false, msg: 'Credits ไม่พอ ต้องการอีก ' + (w.price - profile.gold) };
@@ -166,7 +211,10 @@ function weaponStatsText(w) {
   if (w.type === 'SHOTGUN') return 'DMG ' + w.damage + 'x' + w.pellets + '   ' + w.fireRate + ' ms   น้ำหนัก ' + w.weight;
   if (w.type === 'MELEE') return 'DMG ' + w.damage + ' / ' + w.fireRate + 'ms  ระยะ ' + w.reach + '  นน. ' + w.weight;
   if (w.type === 'LASER') return 'DMG ' + w.damage + (w.beams ? 'x' + w.beams : '') + ' / ' + w.fireRate + 'ms   น้ำหนัก ' + w.weight;
+  if (w.slot === 'drone') return w.desc + '   นน. ' + w.weight;
   if (w.slot === 'gun') return 'DMG ' + w.damage + '   ' + w.fireRate + ' ms   น้ำหนัก ' + w.weight;
+  if (w.type === 'ORBITAL') return 'DMG ' + w.damage + 'x' + ORBITAL_TICKS + '  CD ' + w.cd + 's  นน. ' + w.weight;
+  if (w.type === 'NAPALM') return 'DMG ' + w.damage + ' +ไฟ ' + w.burn + '/' + NAPALM_TICK + 's  CD ' + w.cd + 's  นน. ' + w.weight;
   if (w.type === 'BEAM') return 'DMG ' + w.damage + (w.beams ? 'x' + w.beams : '') + ' ทะลุ  CD ' + (w.cd || MISSILE_DELAYS.BEAM) + 's  นน. ' + w.weight;
   return 'DMG ' + w.damage + (w.count ? 'x' + w.count : '') + '   น้ำหนัก ' + w.weight;
 }

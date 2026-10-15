@@ -33,7 +33,7 @@ function collectItem(it) {
     popText(cx, player.y - 14, '+25 HP', '#5fd36f', 15);
     spawnSparks(cx, player.y + 10, 8, '#5fd36f');
   } else if (it.type === 'refill') {
-    player.shield = SHIELD_MAX;
+    player.shield = shieldMax();
     player.shieldBroken = false;
     player.fuel = maxFuel();
     popText(cx, player.y - 14, 'SHIELD / BOOSTER FULL', '#4fc3f7', 13);

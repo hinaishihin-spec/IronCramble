@@ -10,7 +10,7 @@ let enemyShots = [];
 let beamCharge = null;    // กำลังชาร์จเลเซอร์ไหล่ { t } (null = ไม่ได้ชาร์จ)
 let beamShots = [];       // ลำแสงช็อตของเลเซอร์ไหล่ (Einshander) ที่ยังค้างจางอยู่
 let slashes = [];         // เอฟเฟกต์รอยฟันของอาวุธประชิด
-function resetWeapons() { bullets = []; missiles = []; enemyShots = []; beam = null; laserTick = 0; slashes = []; beamShots = []; beamCharge = null; }
+function resetWeapons() { bullets = []; missiles = []; enemyShots = []; beam = null; laserTick = 0; slashes = []; beamShots = []; beamCharge = null; resetStrikes(); resetDrones(); }
 
 // ยิงอาวุธช่อง slot (0 = ปืน คลิกซ้าย, 1 = มิสไซล์ คลิกขวา/F) ตามข้อมูลใน player.equippedWeapon / WEAPON_DATABASE
 // ดาเมจ = damage ของอาวุธ x atkMult() (เลเวล + แขน)  คูลดาวน์ = fireRate (มิลลิวินาที) หรือ MISSILE_DELAYS ตามประเภท
@@ -48,6 +48,8 @@ function fireWeapon(p, slot) {
       }
       addShake(7);
       spawnSparks(mx, my, 9, '#e8e2c8');
+    } else if (w.type === 'ORBITAL' || w.type === 'NAPALM') {   // อาวุธโจมตีจากฟ้า: ล็อกเป้าตามเมาส์ แล้วรอตก (strike.js)
+      return startStrike(p, w);
     } else if (w.type === 'BEAM') {                  // เลเซอร์ไหล่: ชาร์จที่ไหล่ BEAM_CHARGE วินาที แล้วยิง (ดู releaseEinshander)
       if (!beamCharge) beamCharge = { t: 0, dur: w.charge || BEAM_CHARGE };
       addShake(1.5);
@@ -281,6 +283,8 @@ function updateWeapons(dt) {
   }
   for (let i = slashes.length - 1; i >= 0; i--) { slashes[i].t += dt; if (slashes[i].t >= slashes[i].dur) slashes.splice(i, 1); }
   for (let i = beamShots.length - 1; i >= 0; i--) { beamShots[i].t += dt; if (beamShots[i].t >= BEAM_SHOT_LIFE) beamShots.splice(i, 1); }
+  updateStrikes(dt);
+  updateDrones(dt);
   updateLaser(dt);
   updateBullets(dt);
   updateMissiles(dt);
@@ -433,6 +437,8 @@ function drawBeamShots() {
 }
 
 function drawBeam() {
+  drawStrikes();
+  drawDrones();
   drawBeamShots();
   if (!beam) return;
   const pulse = 0.85 + 0.15 * Math.sin(performance.now() / 35);

@@ -220,6 +220,16 @@ function drawTopBar() {
     ctx.font = "700 11px 'Chakra Petch', monospace";
     ctx.fillStyle = d.sel ? '#ffffff' : '#8d978c';
     ctx.fillText(d.w.name, d.x + 40, 35);
+    if (d.key === 'RMB' && d.w.cd && d.w.cd >= 5 && player.missileCd > 0) {            // อาวุธคูลดาวน์ยาว: แถบมืดไล่ถอยหลัง + เวลาที่เหลือ
+      const f = clamp(player.missileCd / d.w.cd, 0, 1);
+      ctx.fillStyle = 'rgba(8,10,12,0.62)';
+      ctx.fillRect(d.x + 150 - 150 * f, 8, 150 * f, 32);
+      ctx.textAlign = 'right';
+      ctx.font = "700 12px 'Chakra Petch', monospace";
+      ctx.fillStyle = '#ffd23f';
+      ctx.fillText(Math.ceil(player.missileCd) + 's', d.x + 144, 26);
+      ctx.textAlign = 'left';
+    }
   }
 
   // Shield gauge: กดค้างปุ่ม Q เพื่อกางโล่ (ไม่ใช่ช่องอาวุธ)
@@ -233,7 +243,8 @@ function drawTopBar() {
   ctx.fillStyle = '#0f1316';
   ctx.fillRect(578, 23, 120, 13);
   ctx.fillStyle = player.shieldBroken ? '#7b8794' : '#4fc3f7';
-  ctx.fillRect(579, 24, 118 * (player.shield / SHIELD_MAX), 11);
+  ctx.fillRect(579, 24, 118 * Math.min(1, player.shield / shieldMax()), 11);
+  drawDroneHud();
 
   // Credits
   ctx.textAlign = 'right';
@@ -461,7 +472,7 @@ function drawSubChip(t, hot, active) {
   ctx.lineWidth = 1.5;
   ctx.strokeRect(t.x + 1, t.y + 1, t.w - 2, t.h - 2);
   drawText('[' + t.key + '] ' + WEAPON_TYPE_LABEL[t.sub], t.x + t.w / 2, t.y + 14, fnt(700, 10), active ? '#ffd23f' : '#d9dfd2', 'center');
-  if (equippedGun().type === t.sub) { ctx.fillStyle = '#5fd36f'; ctx.fillRect(t.x + t.w - 9, t.y + 6, 4, 4); }
+  if ((HangarScene.tab === 'DRONE' ? (equippedDrone() && equippedDrone().type) : equippedGun().type) === t.sub) { ctx.fillStyle = '#5fd36f'; ctx.fillRect(t.x + t.w - 9, t.y + 6, 4, 4); }
 }
 
 // ปุ่มสลับกลุ่มซีรีส์ในหมวดพาร์ท (จุดเขียว = กลุ่มที่มีชิ้นที่สวมอยู่)
@@ -504,7 +515,7 @@ function drawPartTab(t, hot, active) {
   ctx.strokeStyle = active ? '#e0a526' : (hot ? '#59636d' : '#333c45');
   ctx.lineWidth = 2;
   ctx.strokeRect(t.x + 1, t.y + 1, t.w - 2, t.h - 2);
-  const label = t.tab === 'GUN' ? 'ปืน' : (t.tab === 'MISSILE' ? 'มิสไซล์' : PART_CAT_LABEL[t.tab]);
+  const label = t.tab === 'GUN' ? 'ปืน' : (t.tab === 'MISSILE' ? 'มิสไซล์' : (t.tab === 'DRONE' ? 'โดรน' : PART_CAT_LABEL[t.tab]));
   drawText(label, t.x + t.w / 2, t.y + 19, fnt(700, 10), active ? '#161a1e' : '#d9dfd2', 'center');
   drawText(t.key, t.x + 6, t.y + 10, fnt(600, 8), active ? '#5a4710' : '#6f7a70');
 }
@@ -611,7 +622,7 @@ function drawHangarScreen(h) {
     drawText(h.msg, W / 2, 427, fnt(700, 13), h.msgOk ? '#5fd36f' : '#e0583a', 'center');
     ctx.globalAlpha = 1;
   }
-  drawFitText('1-8 หมวด   Q-P / คลิก = ซื้อและสวม   Z X C V B = ประเภทปืน/ซีรีส์   H = ถอด/ใส่อาวุธ   A / D เลือกด่าน   Enter = LAUNCH   Esc = เมนูหลัก', W / 2, 442, 400, 11, '#6f7a70', 776);
+  drawFitText('1-9 หมวด   Q-P / คลิก = ซื้อและสวม   Z X C V B = ประเภทปืน/ซีรีส์   H = ถอด/ใส่อาวุธ   A / D เลือกด่าน   Enter = LAUNCH   Esc = เมนูหลัก', W / 2, 442, 400, 11, '#6f7a70', 776);
 }
 
 // ตัวเลือกด่านระหว่างปุ่มลูกศรสองข้าง (ปุ่ม < > เป็นรายการใน HangarScene.items)

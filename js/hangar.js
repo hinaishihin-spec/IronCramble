@@ -5,7 +5,7 @@
    กฎการซื้ออยู่ใน upgrades.js  ข้อมูลด่านอยู่ใน missions.js  หน้าตาอยู่ใน ui.js (drawHangarScreen)
    ========================================================================== */
 
-const HANGAR_TABS = PART_CATEGORIES.concat(['GUN', 'MISSILE']);
+const HANGAR_TABS = PART_CATEGORIES.concat(['GUN', 'MISSILE', 'DRONE']);
 const ROW_KEYS = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
 const GUN_TYPES = ['MACHINE_GUN', 'SHOTGUN', 'RIFLE', 'LASER', 'MELEE'];      // แท็บปืนแบ่งตามประเภท (ปืนมีหลายรุ่น แถวเดียวไม่พอ)
 const SUB_KEYS = ['Z', 'X', 'C', 'V', 'B'];
@@ -33,7 +33,7 @@ const HangarScene = {
   rebuild: function () {
     const tabs = HANGAR_TABS;
     const items = [];
-    for (let i = 0; i < tabs.length; i++) items.push({ tab: tabs[i], key: String(i + 1), x: 356 + i * 55, y: 54, w: 52, h: 28 });
+    for (let i = 0; i < tabs.length; i++) items.push({ tab: tabs[i], key: String(i + 1), x: 356 + i * 47, y: 54, w: 45, h: 28 });
     if (this.tab === 'GUN') {
       for (let i = 0; i < GUN_TYPES.length; i++) items.push({ sub: GUN_TYPES[i], key: SUB_KEYS[i], x: 356 + i * 84, y: 88, w: 80, h: 20 });
       const list = weaponList('gun').filter(function (w) { return w.type === HangarScene.sub; });
@@ -42,6 +42,11 @@ const HangarScene = {
     } else if (this.tab === 'MISSILE') {
       const list = weaponList('missile');
       for (let i = 0; i < list.length; i++) items.push({ wp: list[i], key: ROW_KEYS[i], x: 356, y: 90 + i * 24, w: 420, h: 22 });
+    } else if (this.tab === 'DRONE') {
+      const DT = ['FLY', 'BOT'];                                      // โดรนบิน / โดรนบอท (รุ่น I-III อยู่ในกลุ่มเดียวกัน)
+      for (let i = 0; i < DT.length; i++) items.push({ sub: DT[i], key: SUB_KEYS[i], x: 356 + i * 104, y: 88, w: 100, h: 20 });
+      const list = weaponList('drone').filter(function (w) { return w.type === HangarScene.sub; });
+      for (let i = 0; i < list.length; i++) items.push({ wp: list[i], key: ROW_KEYS[i], x: 356, y: 114 + i * 24, w: 420, h: 22 });
     } else {
       let list = partList(this.tab), y0 = 90;
       const groups = partGroups(this.tab);
@@ -79,6 +84,7 @@ const HangarScene = {
     if (t === this.tab) return;
     this.tab = t;
     if (t === 'GUN') this.sub = equippedGun().type;   // เปิดแท็บปืนที่ประเภทของปืนที่สวมอยู่
+    if (t === 'DRONE') this.sub = equippedDrone() ? equippedDrone().type : 'FLY';
     this.rebuild();
   },
 
@@ -132,14 +138,14 @@ const HangarScene = {
   render: function () { drawHangarScreen(this); },
 
   keydown: function (e) {
-    const dm = /^(?:Digit|Numpad)([1-8])$/.exec(e.code);
+    const dm = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
     const rm = ROW_CODES.indexOf(e.code);
-    const sm = this.tab === 'GUN' ? SUB_KEYS.indexOf(e.code.slice(3)) : -1;
-    const isPartTab = this.tab !== 'GUN' && this.tab !== 'MISSILE';
+    const sm = this.tab === 'GUN' || this.tab === 'DRONE' ? SUB_KEYS.indexOf(e.code.slice(3)) : -1;
+    const isPartTab = this.tab !== 'GUN' && this.tab !== 'MISSILE' && this.tab !== 'DRONE';
     const gm = isPartTab && e.code.indexOf('Key') === 0 ? SUB_KEYS.indexOf(e.code.slice(3)) : -1;
     if (gm >= 0 && partGroups(this.tab)[gm]) { this.pg[this.tab] = partGroups(this.tab)[gm]; this.rebuild(); }   // Z X = สลับกลุ่มซีรีส์ของหมวดพาร์ท
-    else if (dm) this.setTab(HANGAR_TABS[+dm[1] - 1]);                  // 1-8 = เปลี่ยนแท็บ
-    else if (sm >= 0 && e.code.indexOf('Key') === 0) { this.sub = GUN_TYPES[sm]; this.rebuild(); }   // Z X C V B = ประเภทปืน/อาวุธประชิด
+    else if (dm) this.setTab(HANGAR_TABS[+dm[1] - 1]);                  // 1-9 = เปลี่ยนแท็บ
+    else if (sm >= 0 && e.code.indexOf('Key') === 0) { const st = (this.tab === 'DRONE' ? ['FLY', 'BOT'] : GUN_TYPES)[sm]; if (st) { this.sub = st; this.rebuild(); } }   // Z X C V B = ประเภทปืน/อาวุธประชิด
     else if (rm >= 0) {                                            // Q W E R T Y U I O P = แถวที่ 1-10 ของแท็บนี้
       const it = this.items.filter(function (x) { return x.part || x.wp; })[rm];
       if (it && it.wp) this.pickWeapon(it.wp.id);

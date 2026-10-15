@@ -12,7 +12,7 @@
                | 'monolet' (หุ่นนกกระจอกเทศยิงเลเซอร์ กระโดดยิง) | 'tplane' (เครื่องบินล่องหนโฉบทิ้งระเบิด ตัวเลขที่ 3 = ความสูงบิน)
                | 'swanzer' (Shotgun Wanzer หุ่น Hammer ถือลูกซอง) | 'mwanzer' (Missile Wanzer หุ่น Hammer ยิงมิสไซล์ครั้งละ 2 นัด)
                (sniper: ตัวเลขที่ 2 = เยื้องเข้าซ้ายจากขอบจอขวา เมื่อมีสไนเปอร์หลายตัวในเวฟเดียว)
-   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber'|'mimic'|'carrier' }
+   boss        (ไม่บังคับ) บอสท้ายด่าน { at: ระยะ(เมตร) ที่ล็อกกล้องแล้วบอสเข้า, name, kind: 'fortress'|'hopper'|'sniper'|'bomber'|'mimic'|'carrier'|'megabolt' }
                ด่านที่มีบอส: จบเมื่อกำจัดบอสได้ (เวฟทั้งหมดต้องอยู่ก่อนระยะ at)
    scene       (ไม่บังคับ) ชื่อชุดภาพฉาก เช่น 'city' -> assets/bg/city_far.png ... ไม่ใส่ = m<เลขด่าน> แล้วถอยไปใช้ default (ดู scenery.js)
    ด่านจบเมื่อ: ทุกเวฟโผล่ครบแล้ว และกำจัดศัตรูหมดทุกตัว (หรือกำจัดบอสได้ ถ้าด่านมีบอส)
@@ -131,6 +131,28 @@ const MISSIONS = [
       { at: 1360, units: [['mwanzer', 0], ['mwanzer', 130], ['swanzer', 250], ['bomber', 60, 85]] },
       { at: 1470, units: [['tplane', 0, 84], ['swanzer', 100], ['mwanzer', 230], ['tank', 330]] },
       { at: 1540, units: [['swanzer', 0], ['swanzer', 120], ['mwanzer', 240], ['monolet', 360]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1620 m)
+    ]
+  },
+  {
+    id: 8, title: 'IRON THUNDER', name: 'MISSION 08  IRON THUNDER',
+    lengthM: 1800, unlockAt: 7, bonusExp: 700, bonusGold: 1400,
+    boss: { at: 1720, name: 'MEGA BOLT', kind: 'megabolt' },
+    waves: [      // ศัตรูชั่วคราว: ผสมจากด่าน 6-7 (เปลี่ยนทีหลังได้)
+      { at: 60,   units: [['swanzer', 0], ['monolet', 120]] },
+      { at: 170,  units: [['mwanzer', 0], ['tplane', 100, 84]] },
+      { at: 290,  units: [['monolet', 0], ['swanzer', 130], ['launcher', 220]] },
+      { at: 400,  units: [['tplane', 0, 82], ['mwanzer', 140], ['sniper', 0]] },
+      { at: 520,  units: [['swanzer', 0], ['swanzer', 120], ['monolet', 240], ['drone', 60, 140]] },
+      { at: 640,  units: [['mwanzer', 0], ['tank', 140], ['monolet', 260]] },
+      { at: 760,  units: [['tplane', 0, 84], ['tplane', 240, 108], ['swanzer', 120]] },
+      { at: 880,  units: [['mwanzer', 0], ['mwanzer', 130], ['swarmer', 220], ['chopper', 60]] },
+      { at: 1000, units: [['monolet', 0], ['monolet', 120], ['swanzer', 240], ['sniper', 0]] },
+      { at: 1120, units: [['swanzer', 0], ['mwanzer', 130], ['tplane', 60, 90], ['tank', 280]] },
+      { at: 1240, units: [['monolet', 0], ['mwanzer', 120], ['swanzer', 240], ['bomber', 60, 85]] },
+      { at: 1360, units: [['tplane', 0, 82], ['swanzer', 110], ['mwanzer', 230], ['launcher', 330]] },
+      { at: 1480, units: [['monolet', 0], ['monolet', 120], ['mwanzer', 240], ['swanzer', 360], ['sniper', 0]] },
+      { at: 1600, units: [['swanzer', 0], ['swanzer', 120], ['mwanzer', 240], ['tank', 380]] },
+      { at: 1680, units: [['monolet', 0], ['mwanzer', 130], ['swanzer', 260]] }     // เวฟสุดท้ายก่อนบอส (ก่อน 1720 m)
     ]
   }
 ];
