@@ -95,7 +95,7 @@ function fireWeapon(p, slot) {
 function meleeSwing(p, g, dmg) {
   const thrust = !!g.thrust, dir = p.facing === 1 ? 1 : -1;
   const a = thrust ? (dir === 1 ? 0 : Math.PI) : p.angle, ca = Math.cos(a), sa = Math.sin(a);   // ชก = ตรงไปข้างหน้า ฟัน = ตามเมาส์
-  const ap0 = armPivotWorld(p), o = thrust && artMode() ? armHandAt(ap0.x, ap0.y, a, 1) : (thrust ? ap0 : gunOriginWorld(p));
+  const ap0 = handPivotWorld(p), o = thrust && artMode() ? armHandAt(ap0.x, ap0.y, a, 1) : (thrust ? ap0 : gunOriginWorld(p));
   const half = (g.arc || 90) * Math.PI / 360, reach = g.reach || 40;
   if (thrust) {                                      // ชก: กล่องหน้ามือ ยาว reach สูง hitH
     const bx0 = Math.min(o.x - dir * 6, o.x + dir * reach), bx1 = Math.max(o.x - dir * 6, o.x + dir * reach);
@@ -364,7 +364,7 @@ function updateMissiles(dt) {
       for (const e of enemies) {
         if (sx >= e.x - 4 && sx <= e.x + e.w + 4 && sy >= e.y - 4 && sy <= e.y + e.h + 4) {
           spawnSparks(sx, sy, 5, '#ffd36b');
-          const killed = damageEnemy(e, Math.max(1, Math.round((m.dmg || MISSILE_DMG) * atkMult(equippedMissile()))), true);
+          const killed = damageEnemy(e, Math.max(1, Math.round((m.dmg || MISSILE_DMG) * atkMult(m.wpn || equippedMissile()))), true);
           if (!killed) knockEnemy(e, ca, sa);          // Knockback ตามทิศของมิสไซล์
           addShake(3);
           smallBoom(sx, sy, m.small ? 15 : 22);

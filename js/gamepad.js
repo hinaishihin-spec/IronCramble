@@ -102,6 +102,17 @@ function pollGamepad(dt) {
     PAD.aimX = player.facing >= 0 ? 1 : -1; PAD.aimY = 0;
   }
 
+  if (typeof Tutorial !== 'undefined' && Tutorial.open) {   // หน้าต่าง Tutorial เปิดอยู่: จอยควบคุมแค่หน้าต่างนี้
+    padRelease();
+    if (edge(1) || edge(8) || edge(9) || edge(10)) Tutorial.close();           // B / Back / Start / L3 = ปิด
+    if (edge(4)) Tutorial.setTab(Tutorial.tab - 1);                            // LB / RB = สลับหัวข้อ
+    if (edge(5)) Tutorial.setTab(Tutorial.tab + 1);
+    if (edge(12)) Tutorial.scroll = Math.max(0, Tutorial.scroll - 40);         // D-pad / สติ๊กขวา ขึ้นลง = เลื่อนอ่าน
+    if (edge(13)) Tutorial.scroll = Math.min(Tutorial.maxScroll, Tutorial.scroll + 40);
+    if (ry) Tutorial.scroll = Math.max(0, Math.min(Tutorial.maxScroll, Tutorial.scroll + ry * 300 * dt));
+    PAD.prev = b.map(function (x) { return x.pressed || x.value > 0.5; });
+    return;
+  }
   if (sc === PlayScene) {
     // ----- เดิน / กระโดด / โล่ -----
     padSetKey('KeyD', lx > 0.35 || dRight);
@@ -120,11 +131,14 @@ function pollGamepad(dt) {
       mouse.y = Math.max(0, Math.min(H, ap.y + PAD.aimY * PAD.AIM_R));
     }
     // ----- ยิง -----
-    const f = trig(7), m = trig(6) || down(2);
+    const hasOff = hasOffGun();                         // ใส่อาวุธมือซ้าย: LT = มือซ้าย, X = มิสไซล์ (F)  ไม่ใส่: LT/X = มิสไซล์เหมือนเดิม
+    padSetKey('KeyF', hasOff && down(2));
+    const f = trig(7), m = hasOff ? trig(6) : (trig(6) || down(2));
     if (f !== PAD.fire) { PAD.fire = f; mouse.down = f; }
     if (m !== PAD.missile) { PAD.missile = m; mouse.rightDown = m; }
     // ----- ปุ่มระบบ -----
     if (player.dead && (edge(3) || edge(0) || edge(9))) Scenes.keydown({ code: 'KeyR' });
+    else if (edge(9) && typeof Tutorial !== 'undefined') Tutorial.show();      // Start = เปิด Tutorial (เกมหยุดชั่วคราว) ตอนหุ่นยังไม่พัง
     else if (edge(8) || (player.dead && edge(1))) Scenes.keydown({ code: 'Escape' });
   } else {
     // ----- เมนู: เคอร์เซอร์ + กระโดดตามทิศ -----
@@ -141,6 +155,7 @@ function pollGamepad(dt) {
     if (edge(0)) Scenes.mousedown();                                   // A = คลิกตรงเคอร์เซอร์
     if (edge(1) || edge(8)) Scenes.keydown({ code: 'Escape' });        // B / Back = ย้อนกลับ
     if (edge(9)) Scenes.keydown({ code: 'Enter' });                    // Start = ยืนยัน / LAUNCH
+    if (edge(10) && typeof Tutorial !== 'undefined') Tutorial.show();  // L3 (กดสติ๊กซ้าย) = เปิด Tutorial
     if (sc === HangarScene) {
       const ti = HANGAR_TABS.indexOf(sc.tab);
       if (edge(4)) sc.setTab(HANGAR_TABS[(ti + HANGAR_TABS.length - 1) % HANGAR_TABS.length]);
@@ -148,6 +163,7 @@ function pollGamepad(dt) {
       if (edge(6)) sc.pickMission(-1);
       if (edge(7)) sc.pickMission(1);
       if (edge(3)) Scenes.keydown({ code: 'KeyH' });
+      if (edge(11)) Scenes.keydown({ code: 'KeyG' });                 // R3 (กดสติ๊กขวา) = สลับมือที่แก้ไขในแท็บปืน
       if (edge(2)) sc.launch();
     }
   }
@@ -160,7 +176,7 @@ function drawGamepadStatus() {                        // แถบสถาน�
   let t, c = '#8d978c';
   if (PAD.err === 'blocked') { t = 'จอยถูกบล็อก: เปิดเกมในแท็บเต็ม/ไฟล์ html ของคุณเอง (ไม่ใช่ใน iframe)'; c = '#e0583a'; }
   else if (PAD.err === 'no-api') { t = 'เบราว์เซอร์นี้ไม่รองรับจอย'; c = '#e0583a'; }
-  else if (!PAD.id) t = 'ไม่พบจอย: กดปุ่มบนจอยหนึ่งครั้ง (ถ้ายังไม่ขึ้น ลองเสียบใหม่/ปิดโปรแกรมอื่นที่ใช้จอย)';
+  else if (!PAD.id) return;           // ไม่มีจอย = ไม่แสดงอะไร (ก้นจอโล่ง) วิธีใช้จอยอยู่ใน Tutorial กด T
   else {
     t = 'จอย: ' + PAD.id.slice(0, 40) + (PAD.mapping === 'standard' ? '' : '  [ไม่ใช่มาตรฐาน ปุ่มอาจเพี้ยน]') + (PAD.lastBtnT > 0 ? '   ปุ่ม ' + PAD.lastBtn : '');
     c = PAD.mapping === 'standard' ? '#5fd36f' : '#e0a526';

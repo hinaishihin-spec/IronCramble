@@ -64,6 +64,17 @@ const Save = (function () {
       const w = findWeapon(eq);
       if (w && w.slot === slot && ownedWeapons.indexOf(eq) >= 0) equippedWeapon[slot] = eq;
     }
+    {                                                  // อาวุธมือซ้าย (dualhand.js): ต้องมีแล้ว ถือมือซ้ายได้ และไม่ซ้ำกับมือขวา ไม่งั้นว่าง
+      const g2 = o.equippedWeapon ? o.equippedWeapon.gun2 : null, w2 = findWeapon(g2);
+      equippedWeapon.gun2 = w2 && w2.slot === 'gun' && ownedWeapons.indexOf(g2) >= 0 && handOk(w2, 'L') && g2 !== equippedWeapon.gun ? g2 : null;
+    }
+    {                                                  // มิสไซล์ไหล่ซ้าย (missile2.js): ต้องมีแล้ว ชนิดใช้คู่ได้ ไม่ซ้ำกับไหล่ขวา และไหล่ขวาเป็นชนิดที่ใช้คู่ได้ ไม่งั้นว่าง
+      const m2id = o.equippedWeapon ? o.equippedWeapon.missile2 : null, m2 = findWeapon(m2id), mm = findWeapon(equippedWeapon.missile);
+      equippedWeapon.missile2 = m2 && m2.slot === 'missile' && POD2_TYPES.indexOf(m2.type) >= 0 && ownedWeapons.indexOf(m2id) >= 0 && m2id !== equippedWeapon.missile && mm && POD2_TYPES.indexOf(mm.type) >= 0 ? m2id : null;
+    }
+    const ownedChips = [];                             // Chip ทักษะ (chips.js): ที่มี + ที่สวมอยู่ (ต้องมีแล้ว)
+    if (Array.isArray(o.ownedChips)) o.ownedChips.forEach(function (id) { if (findChip(id) && ownedChips.indexOf(id) < 0) ownedChips.push(id); });
+    const equippedChip = findChip(o.equippedChip) && ownedChips.indexOf(o.equippedChip) >= 0 ? o.equippedChip : null;
     // จำนวนครั้งที่เคลียร์แต่ละด่าน { เลขด่าน: จำนวนครั้ง } (ใช้ปลดล็อกพาร์ท ดู partext.js)
     const clears = {};
     if (o.clears && typeof o.clears === 'object') {
@@ -82,7 +93,9 @@ const Save = (function () {
       ownedParts: ownedParts,
       equippedParts: equippedParts,
       ownedWeapons: ownedWeapons,
-      equippedWeapon: equippedWeapon
+      equippedWeapon: equippedWeapon,
+      ownedChips: ownedChips,
+      equippedChip: equippedChip
     };
   }
 
@@ -98,7 +111,8 @@ const Save = (function () {
       data: {
         level: p.level, exp: p.exp, gold: p.gold, missions: p.missions, clears: p.clears,
         ownedParts: p.ownedParts, equippedParts: p.equippedParts,
-        ownedWeapons: p.ownedWeapons, equippedWeapon: p.equippedWeapon
+        ownedWeapons: p.ownedWeapons, equippedWeapon: p.equippedWeapon,
+        ownedChips: p.ownedChips, equippedChip: p.equippedChip
       }
     });
   }

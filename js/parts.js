@@ -120,8 +120,8 @@ const WEAPON_ART = {
   SHOTGUN:     { len: 50, grip: [0.65, 0.42], muzzle: 0.01, name: 'shotgun' },
   RIFLE:       { len: 60, grip: [0.73, 0.45], muzzle: 0.00, name: 'rifle' },
   LASER:       { len: 22, grip: [0.55, 0.50], muzzle: 0.03, name: 'laser' },
-  BATON:       { len: 40, grip: [0.85, 0.50], muzzle: 0.00, name: 'baton', rot: 115 },       // กระบอง: หัวกระบองซ้าย ด้ามขวา จับที่ด้าม
-  KNUCKLE:     {   len: 17, grip: [0.85, 0.50], muzzle: 0.00, name: 'knuckle', front: true, rot: 15 },     // สนับมือ: ชิ้นเล็กติดที่กำปั้น
+  BATON:       { len: 40, grip: [0.85, 0.50], muzzle: 0.00, name: 'baton', rot: 90 },       // กระบอง: หัวกระบองซ้าย ด้ามขวา จับที่ด้าม
+  KNUCKLE:     {   len: 17, grip: [0.85, 0.40], muzzle: 0.00, name: 'knuckle', front: true, rot: 0 },     // สนับมือ: ชิ้นเล็กติดที่กำปั้น
   POD:         { len: 12, grip: [0.50, 0.50], muzzle: 0.00, name: 'pod' }
 };
 function weaponArt(w) { return w.slot === 'gun' ? (WEAPON_ART[w.artKey] || WEAPON_ART[w.type]) : WEAPON_ART.POD; }

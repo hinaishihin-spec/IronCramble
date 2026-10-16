@@ -39,5 +39,5 @@ canvas.addEventListener('mousedown', function (e) {
 });
 window.addEventListener('mouseup', function (e) { if (e.button === 0) mouse.down = false; else if (e.button === 2) mouse.rightDown = false; });
 // ยิงมิสไซล์: คลิกขวาค้าง หรือปุ่ม F (สำรองสำหรับทัชแพด/เมาส์ที่ไม่มีปุ่มขวา)
-function missileHeld() { return mouse.rightDown || !!keys.KeyF; }
+function missileHeld() { return (mouse.rightDown && !hasOffGun()) || !!keys.KeyF; }   // ใส่อาวุธมือซ้ายแล้ว คลิกขวายิงมือซ้าย มิสไซล์เหลือแค่ F
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });

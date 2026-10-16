@@ -18,8 +18,9 @@ function freshPlayer() {
     equippedParts: profile.equippedParts,   // พาร์ทที่สวมอยู่ (ออบเจกต์เดียวกับในเซฟ)
     equippedWeapon: profile.equippedWeapon,   // { gun: id, missile: id } อาวุธ 2 ช่อง (ออบเจกต์เดียวกับในเซฟ)
     crouch: 0, walkPhase: 0, walkAmt: 0, bob: 0, breathPhase: 0, land: 0, lean: 0,   // จังหวะเดิน (ใช้ในโหมดภาพ: ตัวย่อลง bob พิกเซลเกม)
+    swingT2: 0, swingDur2: 0, swingArc2: 0, swingThrust2: false, swingAng2: 0, gunCd2: 0,   // มือซ้าย (dualhand.js)
     swingT: 0, swingDur: 0, swingArc: 0, swingThrust: false, swingAng: 0,   // ท่าฟันของอาวุธประชิด (วินาทีที่เหลือ / ทั้งหมด / มุมกว้าง)
-    gunCd: 0, missileCd: 0,         // คูลดาวน์แยกกัน: ปืน (คลิกซ้าย) / มิสไซล์ (คลิกขวา หรือ F)
+    gunCd: 0, missileCd: 0, missileCd2: 0,         // คูลดาวน์แยกกัน: ปืน (คลิกซ้าย) / มิสไซล์ (คลิกขวา หรือ F)
     podAimT: 0,                      // เวลาที่พอดยังเงยชี้ตามเมาส์หลังยิงมิสไซล์ (วินาที)
     beamOn: false, heat: 0, overheated: false,
     fuel: maxFuel(), thrusting: false, prevJumpHeld: false,
@@ -32,7 +33,7 @@ function resetPlayer() { Object.assign(player, freshPlayer()); }
 
 // ---------- สเตตัสที่ผูกกับเลเวล ----------
 // w = อาวุธที่ยิง (ไม่ใส่ = ไม่นับโบนัสตามชนิดอาวุธ)  โบนัสตามชนิดอาวุธมาจากพาร์ท typeBonus (partext.js)
-function atkMult(w) { return (1 + LEVEL_ATK_STEP * (profile.level - 1)) * partsDamageMult() * (1 + (w ? partsTypeBonus(weaponBonusKey(w)) : 0)); }   // เลเวล x โบนัสแขน x โบนัสตามชนิดอาวุธ
+function atkMult(w) { return (1 + LEVEL_ATK_STEP * (profile.level - 1)) * partsDamageMult() * (1 + (w ? partsTypeBonus(weaponBonusKey(w)) : 0)) * (w && w.slot === 'gun' && dualActive() ? DUAL_PENALTY : 1); }   // เลเวล x โบนัสแขน x โบนัสตามชนิดอาวุธ
 function mgDamage() { return Math.max(1, Math.round(MG_DMG * atkMult())); }
 
 function levelUpFx() {
@@ -184,16 +185,36 @@ function updatePlayer(dt) {
 
   // ยิงอาวุธที่ถืออยู่ (ปืน/มิสไซล์ตามที่ติดตั้งจาก Hangar) เลเซอร์ยิงต่อเนื่องผ่าน beamOn แทน
   // ปืนกับมิสไซล์ยิงแยกกัน พร้อมกันได้: ซ้าย = ปืน / ขวา (หรือ F) = มิสไซล์ กางโล่อยู่ยิงไม่ได้ทั้งคู่
-  p.swingT = Math.max(0, p.swingT - dt);
-  p.gunCd -= dt; p.missileCd -= dt; p.podAimT = Math.max(0, p.podAimT - dt);
+  p.swingT = Math.max(0, p.swingT - dt); p.swingT2 = Math.max(0, p.swingT2 - dt); p.gunCd2 -= dt;
+  p.gunCd -= dt; p.missileCd -= dt; p.missileCd2 -= dt; p.podAimT = Math.max(0, p.podAimT - dt);
   const holdingLaser = equippedGun().type === 'LASER';
   if (mouse.down && !p.dead && !holdingLaser && !p.shieldUp && p.gunCd <= 0) {
+    const n0 = bullets.length;
     p.gunCd = fireWeapon(p, 0);
     run.shots++;
+    chipOnGun(p, 'R', n0);                              // Chip ทักษะ (chips.js)
+  }
+  if (hasOffGun() && mouse.rightDown && !p.dead && !p.shieldUp && p.gunCd2 <= 0) {   // มือซ้าย: คลิกขวา (จอย LT)
+    const n0 = bullets.length;
+    p.gunCd2 = withLeftHand(p, function () { return fireWeapon(p, 0); });
+    run.shots++;
+    chipOnGun(p, 'L', n0);
   }
   if (missileHeld() && !p.dead && !p.shieldUp) {
     p.podAimT = 0.5;
-    if (p.missileCd <= 0) { p.missileCd = fireWeapon(p, 1); run.shots++; }
+    const two = hasPod2();                              // มิสไซล์ไหล่ซ้าย (missile2.js): ยิงสลับกับไหล่ขวา อีกพอดที่พร้อมอยู่รอ POD2_STAGGER ของคูลดาวน์
+    if (p.missileCd <= 0) {
+      const wait = two && p.missileCd2 <= 0;
+      p.missileCd = fireWeapon(p, 1); run.shots++;
+      chipOnMissile(p, 'R');
+      if (wait) p.missileCd2 = p.missileCd * POD2_STAGGER;
+    }
+    if (two && p.missileCd2 <= 0) {
+      const wait = p.missileCd <= 0;
+      p.missileCd2 = withPod2(function () { return fireWeapon(p, 1); }); run.shots++;
+      chipOnMissile(p, 'L');
+      if (wait) p.missileCd = Math.max(p.missileCd, p.missileCd2 * POD2_STAGGER);
+    }
   }
 
   // Laser Beam (ปืนประเภท LASER): ยิงต่อเนื่องตราบที่กดเมาส์ ความร้อนเต็มจะ OVERHEAT
@@ -326,6 +347,8 @@ function drawVectorGun(x, y, ang, col, flash, k) {
 // ตำแหน่งปลายมือ (RIG.ARMS.hand บนภาพแขน) หลังหมุนแขนไปตามมุม ang รอบหัวไหล่ (px,py)  k = สเกล  คืนค่าหน่วยเดียวกับ px,py
 // ไม่มีภาพแขน = ใช้ระยะ ARM_REACH ตามแนวเล็งแทน
 function armHandAt(px, py, ang, k, ext) {
+  const ai = armAimInfo();                               // มีภาพแขนท่าเล็ง (_aims) = ใช้จุดมือของภาพนั้น (armaim.js)
+  if (ai) return armAimHandAt(ai, px, py, ang, k, ext);
   const img = equippedPartImage('ARMS');
   if (!img) return { x: px + Math.cos(ang) * ARM_REACH * k, y: py + Math.sin(ang) * ARM_REACH * k };
   const A = RIG.ARMS.a, Hh = RIG.ARMS.hand, sc = SPRITE_H.ARMS * k / img.height;
@@ -337,9 +360,13 @@ function armHandAt(px, py, ang, k, ext) {
 }
 // จุดที่อาวุธปืนจับ (กระสุนออกจากตรงนี้ + ระยะ muzzleDist)
 function gunOriginWorld(p) {
-  const ap = armPivotWorld(p);
+  const ap = handPivotWorld(p);
   return artMode() ? armHandAt(ap.x, ap.y, p.angle, 1) : ap;
 }
+
+// มือซ้าย (dualhand.js): drawMechArt วาดแขน/อาวุธมือซ้ายเฉพาะตอนที่ผู้เล่น/พรีวิว Hangar ตั้ง OFF_DRAW = true (ศัตรูที่ใช้ drawMechArt เหมือนกันจะไม่โดน)
+// OFF_POSE = { ang, ext } ท่าของมือซ้าย (null = ชี้เหมือนมือขวา)
+let OFF_DRAW = false, OFF_POSE = null;
 
 // วาดหุ่นโหมดภาพ: cxS = กึ่งกลางเท้าบนจอ, feetY = พื้นใต้เท้า, k = สเกล (1 = ขนาดในเกม), f = ทิศหัน
 // ลำดับ: แพ็กหลัง > ลำตัว > ขา > หัว > มิสไซล์พอด > แขน+ปืน (หมุนตามเมาส์) > ไหล่  ชิ้นที่ไม่มีภาพจะข้าม
@@ -372,7 +399,46 @@ function drawMechArt(cxS, feetY, k, f, gunAng, podAng, podSel, flash, noWeapons,
     ctx.drawImage(img, -A[0] * img.width, -A[1] * img.height);
     ctx.restore();
   };
-  layer('BACKPACK'); layer('BODY'); layer('LEGS'); layer('HEAD');
+  const drawArm = function (ax, ay, ang, ex) {          // ภาพแขนวาดห้อยลง หมุนรอบข้อต่อไหล่ตามมุมเล็ง (ชี้ซ้ายพลิกซ้ายขวา)
+    const ai = noWeapons ? null : armAimInfo();
+    if (ai) { drawAimArm(ai, ax, ay, ang, k, ex); return; }   // แขนท่าถือปืน (arms_<ไอดี>_aims.png)
+    const armImg = equippedPartImage('ARMS');
+    if (!armImg) return;
+    const sx = Math.cos(ang) >= 0 ? 1 : -1, a2 = sx === 1 ? ang : Math.PI - ang;
+    const sc = SPRITE_H.ARMS * k / armImg.height, A = RIG.ARMS.a;
+    ctx.save(); ctx.translate(ax, ay); ctx.scale(sx, 1); ctx.rotate(a2 - Math.PI / 2);
+    if (ART_FACES_LEFT) ctx.scale(-1, 1);
+    ctx.scale(sc, sc * (1 + ex)); ctx.drawImage(armImg, -A[0] * armImg.width, -A[1] * armImg.height);
+    ctx.restore();
+  };
+  layer('BACKPACK');
+  const offG = noWeapons || !OFF_DRAW ? null : offGun();
+  if (offG) {                                           // แขนซ้าย: อยู่หลังลำตัว สีเข้มกว่าเล็กน้อย
+    const pose = OFF_POSE || { ang: gunAng, ext: 0 }, a0 = place('ARMS');
+    const ap2 = { x: a0.x - fwd * DUAL_OFF_DX * k, y: a0.y + DUAL_OFF_DY * k };
+    const hand2 = armHandAt(ap2.x, ap2.y, pose.ang, k, pose.ext);
+    ctx.save();
+    ctx.filter = (flash ? 'brightness(1.7) sepia(1) saturate(3) hue-rotate(-25deg) ' : '') + 'brightness(' + DUAL_FAR_SHADE + ')';
+    withOffGun(function () {
+      const g = equippedGun(), gi = weaponImage(g), art = weaponArt(g), front = !!art.front;
+      const drawG = function () { if (gi) drawHeldSprite(gi, hand2.x, hand2.y, pose.ang, k, art); else drawVectorGun(hand2.x, hand2.y, pose.ang, partColor('ARMS'), flash, k); };
+      if (!front) drawG();
+      drawArm(ap2.x, ap2.y, pose.ang, pose.ext);
+      if (front) drawG();
+    });
+    ctx.restore();
+  }
+  const pod2 = noWeapons || !OFF_DRAW || !hasPod2() ? null : pod2Weapon();
+  if (pod2) {                                           // พอดไหล่ซ้าย: อยู่หลังลำตัว ถัดหลังพอดขวา สีเข้มกว่าเล็กน้อย
+    const pp2 = leanPt(cxS + (POD_AT.x - POD2_BACK + lr.hipX) * fwd * k, feetY - (POD_AT.y + upY + POD2_UP) * k + bob * k);
+    const pi2 = weaponImage(pod2);
+    ctx.save();
+    ctx.filter = (flash ? 'brightness(1.7) sepia(1) saturate(3) hue-rotate(-25deg) ' : '') + 'brightness(' + POD2_SHADE + ')';
+    if (pi2) drawHeldSprite(pi2, pp2.x, pp2.y, podAng, k, WEAPON_ART.POD);
+    else drawMissilePod(pp2, k, podAng, false, flash);
+    ctx.restore();
+  }
+  layer('BODY'); layer('LEGS'); layer('HEAD');
 
   const pp = leanPt(cxS + (POD_AT.x + lr.hipX) * fwd * k, feetY - (POD_AT.y + upY) * k + bob * k);
   const podImg = noWeapons ? null : weaponImage(equippedMissile());
@@ -390,15 +456,7 @@ function drawMechArt(cxS, feetY, k, f, gunAng, podAng, podSel, flash, noWeapons,
     else drawVectorGun(hand.x, hand.y, gunAng, partColor('ARMS'), flash, k);
   }
 
-  const armImg = equippedPartImage('ARMS');
-  if (armImg) {                                         // ภาพแขนวาดห้อยลง หมุนรอบข้อต่อไหล่ตามมุมเล็ง (ชี้ซ้ายพลิกซ้ายขวา)
-    const sx = Math.cos(gunAng) >= 0 ? 1 : -1, a2 = sx === 1 ? gunAng : Math.PI - gunAng;
-    const sc = SPRITE_H.ARMS * k / armImg.height, A = RIG.ARMS.a;
-    ctx.save(); ctx.translate(ap.x, ap.y); ctx.scale(sx, 1); ctx.rotate(a2 - Math.PI / 2);
-    if (ART_FACES_LEFT) ctx.scale(-1, 1);
-    ctx.scale(sc, sc * (1 + ext)); ctx.drawImage(armImg, -A[0] * armImg.width, -A[1] * armImg.height);
-    ctx.restore();
-  }
+  drawArm(ap.x, ap.y, gunAng, ext);
 
   layer('SHOULDERS');
   if (gunFront) {                                       // สนับมือวาดเป็นชั้นสุดท้าย: ทับทั้งแขนและไหล่ เห็นนอกแขนเสมอ
@@ -422,16 +480,24 @@ function drawPlayer() {
 
   // มุมของปืน (ถือมิสไซล์อยู่ = ปืนลดลงท่าพัก) และของมิสไซล์พอด (ถือปืนอยู่ = พอดเงยพัก)
   const podAimed = player.podAimT > 0;                 // ปืนชี้ตามเมาส์ตลอด พอดเงยชี้เมาส์เฉพาะตอนยิงมิสไซล์ นอกนั้นเงยพัก
-  let gunAng = player.angle, swingExt = 0;
-  if (player.swingT > 0 && player.swingDur > 0) {      // ท่าฟัน: แขนสะบัดจากยกขึ้นลงมา (หันซ้ายต้องกลับทิศ)
-    const prog = 1 - player.swingT / player.swingDur, s = Math.cos(player.angle) >= 0 ? 1 : -1;
-    if (player.swingThrust) { gunAng = player.swingAng; swingExt = 0.4 * Math.sin(prog * Math.PI); }   // ชก: แขนชี้ตรงไปข้างหน้าแล้วยืดออก
-    else gunAng += s * player.swingArc * (prog - 0.5);
-  }
+  const pose = function (T, Dur, Thrust, SAng, Arc) {  // ท่าของแขนข้างหนึ่ง: มุมชี้ + แขนยืด (ท่าฟัน: แขนสะบัดจากยกขึ้นลงมา หันซ้ายต้องกลับทิศ)
+    let ang = player.angle, ext = 0;
+    if (T > 0 && Dur > 0) {
+      const prog = 1 - T / Dur, sd = Math.cos(player.angle) >= 0 ? 1 : -1;
+      if (Thrust) { ang = SAng; ext = 0.4 * Math.sin(prog * Math.PI); }   // ชก: แขนชี้ตรงไปข้างหน้าแล้วยืดออก
+      else ang += sd * Arc * (prog - 0.5);
+    }
+    return { ang: ang, ext: ext };
+  };
+  const main = pose(player.swingT, player.swingDur, player.swingThrust, player.swingAng, player.swingArc);
+  const offP = pose(player.swingT2, player.swingDur2, player.swingThrust2, player.swingAng2, player.swingArc2);
+  let gunAng = main.ang, swingExt = main.ext;
   const podAng = podAimed ? player.angle : (f ? POD_REST : Math.PI - POD_REST);
 
   if (artMode()) {                                    // โหมดภาพซ้อนชั้น 128x160 (2 เท่าของพิกเซลเกม)
-    drawMechArt(cxS, player.y + player.h, 1, f, gunAng, podAng, podAimed, hit, false, player.bob, player.lean, swingExt);
+    OFF_DRAW = true; OFF_POSE = offP;
+    try { drawMechArt(cxS, player.y + player.h, 1, f, gunAng, podAng, podAimed, hit, false, player.bob, player.lean, swingExt); }
+    finally { OFF_DRAW = false; OFF_POSE = null; }
     return;
   }
 
@@ -448,6 +514,12 @@ function drawPlayer() {
   box(cPack, f ? -9 : 40, 10, 9, 20);                 // แพ็กหลัง: กล่องไอพ่นด้านหลัง
   ctx.fillStyle = '#e0a526';
   ctx.fillRect(px + (f ? -7 : 42), py + 27, 5, 3);    // หัวฉีดไอพ่น
+  if (offGun()) {                                     // มือซ้าย (โหมดเวกเตอร์): ปืนอยู่หลังลำตัว สีเข้มกว่า
+    ctx.save();
+    ctx.filter = 'brightness(' + DUAL_FAR_SHADE + ')';
+    withOffGun(function () { drawVectorGun(cx - (f ? 1 : -1) * DUAL_OFF_DX, cy + DUAL_OFF_DY, offP.ang, cArms, hit); });
+    ctx.restore();
+  }
   box(cLegs, 4, 28, 12, 12);                          // ขา 2 ข้าง
   box(cLegs, 24, 28, 12, 12);
   box(cBody, 0, 12, 40, 16);                          // ลำตัว + แผ่นเกราะเข้ม

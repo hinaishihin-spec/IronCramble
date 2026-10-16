@@ -17,6 +17,8 @@ const HangarScene = {
   t: 0,
   msg: '', msgOk: true, msgT: 0,
   flash: 0,
+  pod: 'R',            // ไหล่ที่กำลังแก้ไขในแท็บมิสไซล์: 'R' ไหล่ขวา (ช่องเดิม) / 'L' ไหล่ซ้าย (missile2.js)
+  hand: 'R',           // มือที่กำลังแก้ไขในแท็บปืน: 'R' มือขวา (ปืนหลัก) / 'L' มือซ้าย (dualhand.js)
   sub: 'MACHINE_GUN',  // ประเภทปืนที่เปิดอยู่ในแท็บปืน
   hideWeapons: false,  // ดูตัวอย่างหุ่นแบบถอดอาวุธทั้งหมด (เฉพาะภาพพรีวิว ไม่ถอดอาวุธจริง)
   pg: {},              // กลุ่มซีรีส์ที่เปิดอยู่ของแต่ละหมวดพาร์ท { HEAD: 'ZEUS', ... } (ดู partext.js)
@@ -42,6 +44,8 @@ const HangarScene = {
     } else if (this.tab === 'MISSILE') {
       const list = weaponList('missile');
       for (let i = 0; i < list.length; i++) items.push({ wp: list[i], key: ROW_KEYS[i], x: 356, y: 90 + i * 24, w: 420, h: 22 });
+    } else if (this.tab === 'CHIP') {
+      chipBuildItems(items);
     } else if (this.tab === 'DRONE') {
       const DT = ['FLY', 'BOT'];                                      // โดรนบิน / โดรนบอท (รุ่น I-III อยู่ในกลุ่มเดียวกัน)
       for (let i = 0; i < DT.length; i++) items.push({ sub: DT[i], key: SUB_KEYS[i], x: 356 + i * 104, y: 88, w: 100, h: 20 });
@@ -59,6 +63,9 @@ const HangarScene = {
       const pitch = Math.min(48, Math.floor((340 - y0) / Math.max(1, list.length)));
       for (let i = 0; i < list.length; i++) items.push({ part: list[i], cat: this.tab, key: ROW_KEYS[i], x: 356, y: y0 + i * pitch, w: 420, h: pitch - 4 });
     }
+    items.push({ x: 38, y: 148, w: 92, h: 24, small: true, hint: 'K', label: function () { return HangarScene.tab === 'CHIP' ? 'ปิดชิป [K]' : 'ชิป [K]'; }, action: function () { HangarScene.setTab(HangarScene.tab === 'CHIP' ? (HangarScene.prevTab || 'GUN') : 'CHIP'); } });
+    if (this.tab === 'MISSILE') items.push({ x: 38, y: 120, w: 92, h: 24, small: true, hint: 'G', label: function () { return (HangarScene.pod === 'L' ? 'ไหล่ซ้าย' : 'ไหล่ขวา') + ' [G]'; }, action: function () { HangarScene.togglePod(); } });
+    if (this.tab === 'GUN') items.push({ x: 38, y: 120, w: 92, h: 24, small: true, hint: 'G', label: function () { return (HangarScene.hand === 'L' ? 'มือซ้าย' : 'มือขวา') + ' [G]'; }, action: function () { HangarScene.toggleHand(); } });
     this.items = items.concat([
       {
         x: 500, y: 346, w: 276, h: 50, hint: 'Enter', primary: true,
@@ -69,7 +76,8 @@ const HangarScene = {
       { x: 214, y: 346, w: 34, h: 50, label: '<', hint: 'A', disabled: function () { return selectedMission <= 0; }, action: function () { HangarScene.pickMission(-1); } },
       { x: 456, y: 346, w: 34, h: 50, label: '>', hint: 'D', disabled: function () { return selectedMission >= MISSIONS.length - 1; }, action: function () { HangarScene.pickMission(1); } },
       { x: 38, y: 92, w: 92, h: 24, small: true, label: function () { return HangarScene.hideWeapons ? 'ใส่อาวุธ' : 'ถอดอาวุธ'; }, action: function () { HangarScene.hideWeapons = !HangarScene.hideWeapons; } },
-      { x: 24, y: 352, w: 180, h: 38, label: 'MAIN MENU', hint: 'Esc', action: function () { Scenes.go('menu'); } }
+      { x: 24, y: 352, w: 86, h: 38, label: 'MENU', hint: 'Esc', action: function () { Scenes.go('menu'); } },
+      { x: 118, y: 352, w: 86, h: 38, label: 'MAP', hint: 'N', action: function () { Scenes.go('map'); } }
     ]);
   },
 
@@ -80,10 +88,22 @@ const HangarScene = {
     return eq ? partGroupOf(eq) : groups[0];
   },
 
+  togglePod: function () {                             // G (แท็บมิสไซล์) = สลับไหล่ที่แก้ไข (ขวา/ซ้าย)
+    this.pod = this.pod === 'L' ? 'R' : 'L';
+    this.rebuild();
+  },
+  handGun: function () { return (this.hand === 'L' && offGun()) || equippedGun(); },
+  toggleHand: function () {                            // G = สลับไปแก้ไขอาวุธมือขวา / มือซ้าย
+    this.hand = this.hand === 'L' ? 'R' : 'L';
+    this.sub = this.handGun().type;
+    this.rebuild();
+  },
+
   setTab: function (t) {
     if (t === this.tab) return;
+    if (t === 'CHIP') this.prevTab = this.tab;
     this.tab = t;
-    if (t === 'GUN') this.sub = equippedGun().type;   // เปิดแท็บปืนที่ประเภทของปืนที่สวมอยู่
+    if (t === 'GUN') this.sub = this.handGun().type;   // เปิดแท็บปืนที่ประเภทของปืนที่สวมอยู่
     if (t === 'DRONE') this.sub = equippedDrone() ? equippedDrone().type : 'FLY';
     this.rebuild();
   },
@@ -99,11 +119,19 @@ const HangarScene = {
 
   // กดแถวอาวุธ: ซื้อ (ถ้ายังไม่มี) แล้วสวมเข้าช่องของอาวุธนั้น (ช่องละ 1 กระบอก)
   pickWeapon: function (id) {
-    const res = buyOrEquipWeapon(id);
+    const res = buyOrEquipWeapon(id, this.tab === 'MISSILE' ? this.pod : this.hand);
     this.msg = res.msg + (res.ok && isOverweight() ? '  ⚠ OVERWEIGHT' : '');
     this.msgOk = res.ok;
     this.msgT = 2.5;
     if (res.ok) this.flash = 0.5;
+  },
+
+  pickChip: function (id) { this.chipMsg(buyOrEquipChip(id)); },
+  chipMsg: function (res) {
+    this.msg = res.msg;
+    this.msgOk = res.ok;
+    this.msgT = 2.5;
+    if (res.ok) { this.flash = 0.5; this.rebuild(); }
   },
 
   // เปลี่ยนด่านที่เลือก (เลือกดูด่านที่ยังล็อกได้ แต่ LAUNCH จะกดไม่ได้)
@@ -147,10 +175,15 @@ const HangarScene = {
     else if (dm) this.setTab(HANGAR_TABS[+dm[1] - 1]);                  // 1-9 = เปลี่ยนแท็บ
     else if (sm >= 0 && e.code.indexOf('Key') === 0) { const st = (this.tab === 'DRONE' ? ['FLY', 'BOT'] : GUN_TYPES)[sm]; if (st) { this.sub = st; this.rebuild(); } }   // Z X C V B = ประเภทปืน/อาวุธประชิด
     else if (rm >= 0) {                                            // Q W E R T Y U I O P = แถวที่ 1-10 ของแท็บนี้
-      const it = this.items.filter(function (x) { return x.part || x.wp; })[rm];
-      if (it && it.wp) this.pickWeapon(it.wp.id);
+      const it = this.items.filter(function (x) { return x.part || x.wp || x.chipfam; })[rm];
+      if (it && it.chipfam) this.chipMsg(chipPickFamily(it.chipfam));
+      else if (it && it.wp) this.pickWeapon(it.wp.id);
       else if (it) this.pickPart(it.cat, it.part.id);
     }
+    else if (e.code === 'KeyK') this.setTab(this.tab === 'CHIP' ? (this.prevTab || 'GUN') : 'CHIP');   // K = แผงชิปทักษะ
+    else if (e.code === 'KeyN') Scenes.go('map');                                // N = แผนที่โลก (เลือกด่าน)
+    else if (e.code === 'KeyG' && this.tab === 'GUN') this.toggleHand();
+    else if (e.code === 'KeyG' && this.tab === 'MISSILE') this.togglePod();          // G = สลับมือที่แก้ไข (ขวา/ซ้าย)
     else if (e.code === 'KeyH') this.hideWeapons = !this.hideWeapons;           // H = ถอด/ใส่อาวุธ (พรีวิวหุ่นเปล่า)
     else if (e.code === 'KeyA' || e.code === 'ArrowLeft') this.pickMission(-1);
     else if (e.code === 'KeyD' || e.code === 'ArrowRight') this.pickMission(1);
@@ -166,6 +199,8 @@ const HangarScene = {
     if (it.sub) { this.sub = it.sub; this.rebuild(); return; }
     if (it.pgroup) { this.pg[this.tab] = it.pgroup; this.rebuild(); return; }
     if (it.wp) { this.pickWeapon(it.wp.id); return; }
+    if (it.chip) { this.pickChip(it.chip.id); return; }
+    if (it.chipfam) { this.chipMsg(chipPickFamily(it.chipfam)); return; }
     if (it.primary) { this.launch(); return; }        // ปุ่ม LAUNCH: ถ้าด่านล็อก launch() จะแสดงข้อความบอกสาเหตุ
     const off = typeof it.disabled === 'function' ? it.disabled() : it.disabled;
     if (off) return;                                  // ลูกศรที่สุดขอบรายการ กดไม่ได้

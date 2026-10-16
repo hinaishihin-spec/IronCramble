@@ -152,4 +152,4 @@ const CompleteScene = {
   }
 };
 
-Scenes.registry = { menu: MenuScene, hangar: HangarScene, play: PlayScene, complete: CompleteScene, saves: SaveScene };
+Scenes.registry = { menu: MenuScene, hangar: HangarScene, play: PlayScene, complete: CompleteScene, saves: SaveScene, map: MapScene };
