@@ -26,7 +26,7 @@ const PAD = {
   prev: [],              // สถานะปุ่มเฟรมก่อน (ไว้จับจังหวะกด)
   held: {},              // keys ที่จอยเป็นคนกดอยู่ (ปล่อยเองเมื่อจอยปล่อย ไม่ไปลบของคีย์บอร์ด)
   fire: false, missile: false,
-  aimX: 1, aimY: 0, aiming: false,
+  aimX: 1, aimY: 0, aiming: false, stickAim: false,
   lastScene: null,
   toast: '', toastT: 0,
   err: '', id: '', mapping: '', lastBtn: -1, lastBtnT: 0
@@ -123,12 +123,13 @@ function pollGamepad(dt) {
     // ----- Dash (ต้องดันทิศเดินค้างไว้ด้วย เหมือน Shift + A/D) -----
     if (edge(1) || edge(5)) player.dashBuffer = 0.15;
     // ----- เล็ง: สติ๊กขวา ตั้งเป้าที่ระยะคงที่รอบหัวไหล่ -----
-    if (rx || ry) { const m = Math.hypot(rx, ry); PAD.aimX = rx / m; PAD.aimY = ry / m; PAD.aiming = true; }
-    else if (!PAD.aiming && PAD.active && (lx || dLeft || dRight)) { PAD.aimX = (lx || (dRight ? 1 : -1)) > 0 ? 1 : -1; PAD.aimY = 0; PAD.aiming = true; }
+    if (rx || ry) { const m = Math.hypot(rx, ry); PAD.aimX = rx / m; PAD.aimY = ry / m; PAD.aiming = true; PAD.stickAim = true; }
+    else if (!PAD.aiming && PAD.active && (lx || dLeft || dRight)) { PAD.aimX = (lx || (dRight ? 1 : -1)) > 0 ? 1 : -1; PAD.aimY = 0; PAD.aiming = true; PAD.stickAim = false; }
     if (PAD.aiming && !player.dead) {
       const ap = armPivotWorld(player);
-      mouse.x = Math.max(0, Math.min(W, ap.x - cam + PAD.aimX * PAD.AIM_R));
-      mouse.y = Math.max(0, Math.min(H, ap.y + PAD.aimY * PAD.AIM_R));
+      const as = padAimAssist(ap, PAD.aimX, PAD.aimY, dt, PAD.stickAim);   // Aim assist (aimassist.js): ช่วยเฉพาะตอนสติ๊กขวากำลังเล็ง
+      mouse.x = Math.max(0, Math.min(W, ap.x - cam + as.x * PAD.AIM_R));
+      mouse.y = Math.max(0, Math.min(H, ap.y + as.y * PAD.AIM_R));
     }
     // ----- ยิง -----
     const hasOff = hasOffGun();                         // ใส่อาวุธมือซ้าย: LT = มือซ้าย, X = มิสไซล์ (F)  ไม่ใส่: LT/X = มิสไซล์เหมือนเดิม

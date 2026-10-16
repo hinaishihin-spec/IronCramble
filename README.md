@@ -306,3 +306,7 @@
 - เพิ่มค่า (passive): HP, GUN ดาเมจปืน, SMASH ดาเมจอาวุธประชิด, DEF ลดดาเมจ (บวกเพิ่มจากเพดานของพาร์ท), BOOST แรงพุ่ง Dash
 - ปรับข้อมูลที่ `CHIP_FAMILIES` (ค่า vals, ด่านที่ปลดล็อก mission), ราคา `CHIP_PRICE_*`, จำนวนครั้งปลดล็อก `CHIP_LV_CLEARS` ต้นไฟล์ chipdata.js
 - ใส่ชิปใหม่: เพิ่มแถวใน `CHIP_FAMILIES` (ถ้าเป็น proc ต้องเพิ่มเงื่อนไขใน `chipOnGun` / `chipOnMissile` ที่ chips.js  ถ้าเป็น passive เพิ่มใน wrapper ด้านบนของ chips.js)
+
+## Aim assist จอยเกมแพด (js/aimassist.js)
+- สติ๊กขวาเล็งใกล้ศัตรู ทิศเล็งถูกดูดเข้าเป้าเบา ๆ (ไม่ล็อกเต็มตัว) เฉพาะจอย เมาส์ไม่ได้รับผล
+- ปรับที่ต้นไฟล์: `AIM_ASSIST_ON` (ปิดทั้งระบบ), `AIM_ASSIST_PULL` (แรงดูด), `AIM_ASSIST_CONE` (กรวย), `AIM_ASSIST_RANGE` (ระยะ), `AIM_ASSIST_STICKY` (ติดเป้าเดิม), `AIM_ASSIST_SMOOTH`
